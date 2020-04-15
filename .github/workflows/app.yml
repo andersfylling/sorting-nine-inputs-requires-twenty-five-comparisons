@@ -1,4 +1,4 @@
-name: Standalone
+name: App
 
 on: [push]
 
@@ -11,10 +11,10 @@ jobs:
     - uses: actions/checkout@v1
     
     - name: configure
-      run: cmake -Hstandalone -Bbuild
+      run: cmake -Happ -Bbuild
 
     - name: build
       run: cmake --build build -j4
 
     - name: run
-      run: ./build/Greeter
+      run: ./build/Sortnet
