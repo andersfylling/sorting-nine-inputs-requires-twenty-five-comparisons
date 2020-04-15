@@ -18,8 +18,21 @@ The core logic will not receive further changes as it is considered "complete" -
 - Test suite
 - Somewhat modular code
 
+## Code flow
+The generate and prune approach, is what it sounds; it generates all the networks and their output sets for a given layer and then compares the outputs sets against each other in order to remove redundant networks.
+
+To detect early on if a network does not subsume another by permutation, several preconditions can be used, the first one being that a set A can only subsume a set B by checking the size: size(A) <= size(B). The remaining preconditions can be found below (lemma 4 and lemma 5). The worst case lookup/comparisons of output sets can be identified by a nth triangle of M => M(M+1)/2. Where M is the number of network generated.
+
 ## Core logic
 This section details the significant findings that allows reduces the problem space.
+
+### Lemma 2
+
+> Let Ca and Cb be comparator networks on n channels, both of the same size, and such that Ca subsumes Cb. Then, if there exists a sorting network Cb;C of size k, there also exists a sorting network Ca;C of size k.
+
+I'll explain this in two parts. 
+1. If the two networks produce output sets with the same size (the output sets are the same), then the combination of comparators required to sort the output sets are exactly the same.
+2. If Ca produces a output set that subsumes (exists within) the output set of Cb, then the output set of Ca would require the same amount of comparators or less than the output set of Cb to become sorted. Since we only care anout the minimal number of comparators, and not how the networks actually look, we can view this as a "survival of the fittest" type of situation where the cost function is the number of comparators required to sort a output set.
 
 ### Lemma 4
 
