@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/TheLartians/ModernCppStarter/branch/master/graph/badge.svg)](https://codecov.io/gh/TheLartians/ModernCppStarter)
 
 # About
-This is a *third-party* c++ implementation of the paper "Twenty-Five Comparators is Optimal when Sorting Nine Inputs (and Twenty-Nine for Ten)"[1]. It exists to make a reliable reference point for other researchers that wants to compare the performance of their ideas/findings.
+This is a *third-party* c++ implementation of the paper "Sorting nine inputs requires twenty-five comparisons"[1]. It exists to make a reliable reference point for other researchers that wants to compare the performance of their ideas/findings.
 
 The core logic will not receive further changes as it is considered "complete" - in the sense that the implementation is correct. However, code design, naming, or anything that improves on readability are acceptable changes.
  
