@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(GreeterStandalone
+project(SortnetApp
   LANGUAGES CXX
 )
 
@@ -18,20 +18,20 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  NAME Greeter
+  NAME Sortnet
   SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..
 )
 
 # ---- Create standalone executable ----
 
-file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-add_executable(GreeterStandalone ${sources})
+add_executable(SortnetApp ${sources})
 
-set_target_properties(GreeterStandalone PROPERTIES 
-  CXX_STANDARD 17 
+set_target_properties(SortnetApp PROPERTIES
+  CXX_STANDARD 20
   COMPILE_FLAGS "-Wall -pedantic -Wextra"
-  OUTPUT_NAME "Greeter"
+  OUTPUT_NAME "Sortnet"
 )
 
-target_link_libraries(GreeterStandalone Greeter cxxopts)
+target_link_libraries(SortnetApp Sortnet cxxopts)

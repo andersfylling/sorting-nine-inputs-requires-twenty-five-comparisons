@@ -1,3 +1,10 @@
 /build*
 /.vscode
 .DS_Store
+.idea
+cmake-build-debug/*
+cmake-build-release/*
+app/cmake-build-debug/*
+app/cmake-build-release/*
+test/cmake-build-debug/*
+test/cmake-build-release/*
