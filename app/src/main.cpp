@@ -1,4 +1,4 @@
-#include <greeter.h>
+#include <sortnet/greeter.h>
 
 #include <cxxopts.hpp>
 #include <iostream>
