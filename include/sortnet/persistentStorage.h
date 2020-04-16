@@ -5,10 +5,11 @@
 #include <map>
 #include <string>
 
-#include "../config/config.h"
 #include "json.h"
 #include "sortnet/sets/concept.h"
 #include "util.h"
+
+#include "z_environment.h"
 
 template <ComparatorNetwork Net, SeqSet Set, uint8_t N, uint8_t K>
 class PersistentStorage {

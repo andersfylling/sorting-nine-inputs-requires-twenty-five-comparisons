@@ -4,9 +4,10 @@
 #include <fstream>
 #include <limits>
 
-#include "../config/config.h"
 #include "sequence.h"
 #include "sortnet/sets/concept.h"
+
+#include "z_environment.h"
 
 constexpr uint64_t factorial(uint64_t n) {
   if (n == 0) {

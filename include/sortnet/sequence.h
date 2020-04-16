@@ -5,8 +5,9 @@
 #include <bit>
 #include <string>
 
-#include "../config/config.h"
 #include "bits.h"
+
+#include "z_environment.h"
 
 namespace sequence::binary {
 using sequence_t = uint_fast16_t;

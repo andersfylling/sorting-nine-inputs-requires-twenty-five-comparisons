@@ -8,7 +8,7 @@
 #include "sortnet/permutation.h"
 #include "sortnet/sequence.h"
 
-#include "../../config/config.h"
+#include "../z_environment.h"
 
 template <uint8_t N, uint8_t K>
 class ListNaive {

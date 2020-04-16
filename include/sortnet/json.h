@@ -1,5 +1,7 @@
 #pragma once
 
+#include "z_environment.h"
+
 #ifdef at
 #define at_removed 1
 #undef at

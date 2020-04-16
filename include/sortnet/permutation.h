@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "../config/config.h"
 #include "sequence.h"
 #include "sortnet/sets/concept.h"
+
+#include "z_environment.h"
 
 namespace permutation {
 // index represents the bit position from right to left

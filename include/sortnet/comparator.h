@@ -4,7 +4,7 @@
 
 #include "sequence.h"
 
-#include "../config/config.h"
+#include "z_environment.h"
 
 class Comparator {
 private:
@@ -15,7 +15,9 @@ public:
   constexpr Comparator(const uint8_t from, const uint8_t to) : from(from), to(to) {};
   constexpr Comparator(const Comparator &rhs) = default;
   constexpr Comparator &operator=(const Comparator &rhs) = default;
-  constexpr bool operator==(const Comparator &rhs) const = default;
+  constexpr bool operator==(const Comparator &rhs) const {
+      return rhs.from == from && rhs.to == to;
+  };
 
   constexpr bool empty() const {
     return from == 0 && to == 0;

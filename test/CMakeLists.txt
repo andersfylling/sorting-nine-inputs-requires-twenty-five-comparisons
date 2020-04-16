@@ -37,7 +37,7 @@ CPMAddPackage(
 # ---- Create binary ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-add_executable(SortnetTests ${sources})
+add_executable(SortnetTests ${sources} src/failedInclude.cpp)
 target_link_libraries(SortnetTests doctest Sortnet)
 
 set_target_properties(SortnetTests PROPERTIES CXX_STANDARD 20)

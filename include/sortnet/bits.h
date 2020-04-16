@@ -2,8 +2,9 @@
 
 #include <type_traits>
 
-#include "../config/config.h"
 #include "sortnet/vendors/github.com/kimwalisch/libpopcnt/libpopcnt.h"
+
+#include "z_environment.h"
 
 namespace bits {
 

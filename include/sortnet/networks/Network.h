@@ -5,7 +5,7 @@
 #include "sortnet/comparator.h"
 #include "sortnet/util.h"
 
-#include "../config/config.h"
+#include "../z_environment.h"
 
 template <uint8_t N, uint8_t K>
 class Network {
