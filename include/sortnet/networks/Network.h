@@ -21,8 +21,7 @@ class Network {
       throw std::logic_error("this network can not fit any more comparators");
     }
 
-    auto pos = ::comparator::pos<N>(c);
-    if (c == 0 || pos.first > N || pos.second > N || pos.first <= pos.second) {
+    if (c.empty() || c.from > N || c.to > N || c.from <= c.to) {
       throw std::logic_error("comparator is invalid according to spec");
     }
     addUnsafe(c);

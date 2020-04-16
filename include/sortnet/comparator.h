@@ -8,10 +8,11 @@
 
 class Comparator {
 private:
+
+public:
   uint8_t from;
   uint8_t to;
 
-public:
   constexpr Comparator(const uint8_t from, const uint8_t to) : from(from), to(to) {};
   constexpr Comparator(const Comparator &rhs) = default;
   constexpr Comparator &operator=(const Comparator &rhs) = default;

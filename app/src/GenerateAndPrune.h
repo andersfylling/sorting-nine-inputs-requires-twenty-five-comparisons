@@ -6,14 +6,15 @@
 #include <list>
 #include <vector>
 
-#include "../config/config.h"
-#include "sortnet/BufferPool.h"
-#include "sortnet/json.h"
-#include "sortnet/metric.h"
-#include "sortnet/networks/concept.h"
-#include "sortnet/permutation.h"
-#include "sortnet/sets/concept.h"
-#include "sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
+#include <sortnet/BufferPool.h>
+#include <sortnet/json.h>
+#include <sortnet/metric.h>
+#include <sortnet/networks/concept.h>
+#include <sortnet/permutation.h>
+#include <sortnet/sets/concept.h>
+#include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
+
+#include <sortnet/z_environment.h>
 
 struct NetAndSetFilename {
   const std::string net;

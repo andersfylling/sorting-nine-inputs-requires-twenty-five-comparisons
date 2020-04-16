@@ -1,6 +1,5 @@
 #pragma once
 
-#include "sortnet/comparators/concept.h"
 #include "sortnet/sequence.h"
 
 template <class T>

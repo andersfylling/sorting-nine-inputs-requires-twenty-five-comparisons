@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(SortnetApp
   LANGUAGES CXX
@@ -43,8 +43,10 @@ add_executable(SortnetApp ${headers} ${sources})
 
 set_target_properties(SortnetApp PROPERTIES
   CXX_STANDARD 20
-  COMPILE_FLAGS "-Wall -pedantic -Wextra"
+  COMPILE_FLAGS "-Wall -pedantic -Wextra -D_GLIBCXX_ASSERTIONS -Wno-sign-compare -Wno-narrowing -fconcepts"
   OUTPUT_NAME "Sortnet"
 )
+
+set(Boost_USE_STATIC_LIBS ON)
 
 target_link_libraries(SortnetApp Sortnet tabulate progress-cpp cxxopts)

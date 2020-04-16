@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(SortnetTests
   LANGUAGES CXX
@@ -37,7 +37,7 @@ CPMAddPackage(
 # ---- Create binary ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-add_executable(SortnetTests ${sources} src/failedInclude.cpp)
+add_executable(SortnetTests ${sources})
 target_link_libraries(SortnetTests doctest Sortnet)
 
 set_target_properties(SortnetTests PROPERTIES CXX_STANDARD 20)
@@ -45,7 +45,7 @@ set_target_properties(SortnetTests PROPERTIES CXX_STANDARD 20)
 # enable compiler warnings
 if (NOT TEST_INSTALLED_VERSION)
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(Sortnet PUBLIC -Wall -pedantic -Wextra -Werror)
+    target_compile_options(Sortnet PUBLIC -Wall -pedantic -Wextra -Werror -fconcepts)
   elseif(MSVC)
     target_compile_options(Sortnet PUBLIC /W4 /WX)
   endif()

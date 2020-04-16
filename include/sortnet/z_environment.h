@@ -1,6 +1,11 @@
 #pragma once
 
 // compile time configurations
+// ----------------------------------------
+#ifndef UNIT_TEST
+#define UNIT_TEST 0
+#endif
+// ----------------------------------------
 #ifndef RECORD_INTERNAL_METRICS
 #define RECORD_INTERNAL_METRICS 1
 #endif
@@ -10,11 +15,19 @@
 #endif
 // ----------------------------------------
 #ifndef SAVE_METRICS
+#if (UNIT_TEST == 1)
+#define SAVE_METRICS 0
+#else
 #define SAVE_METRICS 1
+#endif
 #endif
 // ----------------------------------------
 #ifndef RECORD_ANALYSIS
+#if (UNIT_TEST == 1)
+#define RECORD_ANALYSIS 0
+#else
 #define RECORD_ANALYSIS 1
+#endif
 #endif
 // ----------------------------------------
 #ifndef RECORD_IO_TIME
@@ -26,11 +39,19 @@
 #endif
 // ----------------------------------------
 #ifndef PRINT_LAYER_SUMMARY
+#if (UNIT_TEST == 1)
+#define PRINT_LAYER_SUMMARY 0
+#else
 #define PRINT_LAYER_SUMMARY 1
+#endif
 #endif
 // ----------------------------------------
 #ifndef PRINT_PROGRESS
+#if (UNIT_TEST == 1)
+#define PRINT_PROGRESS 0
+#else
 #define PRINT_PROGRESS 1
+#endif
 #endif
 // ----------------------------------------
 #ifndef SEGMENT_SIZE

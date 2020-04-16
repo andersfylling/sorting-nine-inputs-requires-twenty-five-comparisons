@@ -29,49 +29,15 @@ inline constexpr int8_t MSB(const T x) {
   static_assert(std::is_same<uint64_t, T>::value || std::is_same<uint32_t, T>::value ||
                     std::is_same<uint16_t, T>::value || std::is_same<uint8_t, T>::value,
                 "numeric type must be unsigned and have the size of range <8, 64>");
-#if !defined(__clang__) && !defined(__GNUC__)
-  uint8_t size = 0;
+  // TODO: clang support?
   if constexpr (std::is_same<uint64_t, T>::value) {
-    size = 64;
-  } else if constexpr (std::is_same<uint32_t, T>::value) {
-    size = 32;
-  } else if constexpr (std::is_same<uint16_t, T>::value) {
-    size = 16;
-  } else if constexpr (std::is_same<uint8_t, T>::value) {
-    size = 8;
-  }
-
-  for (int i = size - 1; i >= 0; i--) {
-    if (isset(x, i)) {
-      return i;
-    }
-  }
-  return 0;  // undefined if x is 0
-#endif
-  if constexpr (std::is_same<uint64_t, T>::value) {
-#ifdef __clang__
-    return -1;
-#elif __GNUC__
     return (x > 0) ? 63 - __builtin_clzll(x) : -1;
-#endif
   } else if constexpr (std::is_same<uint32_t, T>::value) {
-#ifdef __clang__
-    return -1;
-#elif __GNUC__
     return (x > 0) ? 31 - __builtin_clzl(x) : -1;
-#endif
   } else if constexpr (std::is_same<uint16_t, T>::value) {
-#ifdef __clang__
-    return -1;
-#elif __GNUC__
     return (x > 0) ? 15 - __builtin_clz(x) : -1;
-#endif
   } else {
-#ifdef __clang__
-    return -1;
-#elif __GNUC__
     return (x > 0) ? 7 - __builtin_clz(x) : -1;
-#endif
   }
 }
 

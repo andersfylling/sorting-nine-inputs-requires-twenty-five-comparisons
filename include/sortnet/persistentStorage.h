@@ -4,12 +4,14 @@
 #include <chrono>
 #include <map>
 #include <string>
+#include <boost/filesystem.hpp>
 
-#include "json.h"
+#include "sortnet/json.h"
 #include "sortnet/sets/concept.h"
-#include "util.h"
+#include "sortnet/networks/concept.h"
+#include "sortnet/util.h"
 
-#include "z_environment.h"
+#include "sortnet/z_environment.h"
 
 template <ComparatorNetwork Net, SeqSet Set, uint8_t N, uint8_t K>
 class PersistentStorage {
@@ -62,6 +64,18 @@ class PersistentStorage {
 #if (RECORD_IO_TIME == 1)
   uint64_t duration{};
 #endif
+
+  explicit PersistentStorage(const bool clearDir) {
+    if (clearDir) {
+      const auto path = boost::filesystem::path(dir);
+      boost::filesystem::remove_all(path);
+      boost::filesystem::create_directory(path);
+    }
+  }
+
+  PersistentStorage() {
+    PersistentStorage(true);
+  }
 
   std::string filenameNetworks(uint8_t size, uint64_t snr) {
     return this->fileName(PrefixNetworks, size, snr);

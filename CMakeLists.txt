@@ -40,7 +40,7 @@ CPMAddPackage(
 
 if (nlohmann_json_ADDED)
     add_library(nlohmann_json INTERFACE IMPORTED)
-    target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR})
+    target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 endif()
 
 CPMAddPackage(
@@ -59,7 +59,7 @@ endif()
 
 # Note: globbing sources is considered bad practice as CMake's generators may not detect new files automatically.
 # Keep that in mind when changing files, or explicitly mention them here.
-FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h")
+FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/**/**/*.h")
 FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp")
 
 # ---- Create library ----
@@ -68,8 +68,7 @@ FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
 # add_library(Greeter INTERFACE)  
 # set_target_properties(Greeter PROPERTIES INTERFACE_COMPILE_FEATURES cxx_std_17)
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_ASSERTIONS")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-sign-compare -Wno-narrowing -fconcepts")
+set(CMAKE_REQUIRED_FLAGS -fconcepts)
 
 add_library(Sortnet ${headers} ${sources})
 
@@ -79,10 +78,12 @@ set_target_properties(Sortnet PROPERTIES CXX_STANDARD 20)
 target_compile_options(Sortnet PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # Link dependencies (if required)
-target_link_libraries(Sortnet PUBLIC cxxopts nlohmann_json boost)
+target_link_libraries(Sortnet PUBLIC nlohmann_json boost)
 
 target_include_directories(Sortnet
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+  PRIVATE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 )

@@ -53,7 +53,7 @@ permutation_t<N> createPaper(const std::array<uint8_t, N> &pArr) {
 template <uint8_t N>
 constexpr sequence_t apply(const permutation_t<N> &p, const sequence_t s) {
   sequence_t product{0};
-  for (auto i{0}; i < p.size(); ++i) {
+  for (std::size_t i{0}; i < p.size(); ++i) {
     const auto v{(s >> i) & 1};
     const auto pos{p.at(i)};
     product |= v << pos;
@@ -66,9 +66,6 @@ bool generate(const std::array<sequence_t, N> &              constraints,
               const std::function<bool(permutation_t<N> &)> &__f) {
   std::vector<std::vector<uint8_t>> stack{};
   permutation_t<N>                  p{};
-  for (auto i{0}; i < noEffect.size(); ++i) {
-    noEffect.at(i) = i;
-  }
 
   // add the possibilities for the first position
   for (uint8_t i{0}; i < N; ++i) {

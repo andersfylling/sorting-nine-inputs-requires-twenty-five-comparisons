@@ -44,10 +44,10 @@ std::string Network<N, K>::to_string(sequence_t s) const {
   // eg: "(1, 2); (3, 4); (1, 4);"
   auto i{0};
   for (const auto &c : comparators) {
-    if (i == _size) {
+    if (i == comparators.size()) {
       break;
     }
-    output += ::comparator::to_string<N>(c) + " ";
+    output += c.to_string<N>() + " ";
     i++;
   }
 
@@ -70,10 +70,9 @@ std::string Network<N, K>::knuthDiagram(sequence_t s) const {
     auto ir = (N - 1) - i;
     // vertex / node
     output += s == 0 ? " " : std::to_string((s >> ir) & 1);
-    for (auto j = 0; j < _size; j++) {
+    for (const auto c : comparators) {
       output += "--";
-      auto layer = this->comparators.at(j);
-      if (comparator::touches<N>(layer, i)) {
+      if (c.from == i || c.to == i) { // TODO: might need to be inverted!
         output += "+";
       } else {
         output += "-";
@@ -89,12 +88,9 @@ std::string Network<N, K>::knuthDiagram(sequence_t s) const {
 
     // spaces & edge
     output += " ";
-    for (auto j = 0; j < this->size; j++) {
-      auto layer = this->comparators.at(j);
-      auto pos   = ::comparator::pos<N>(layer);
-
+    for (const auto c : comparators) {
       output += "  ";
-      if (i < pos.second && (i == pos.first || i > pos.first)) {
+      if (i < c.to && (i == c.from || i > c.from)) { // TODO: might need to be inverted!
         output += "|";
       } else {
         output += " ";

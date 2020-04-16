@@ -14,9 +14,10 @@ template <uint8_t N, uint8_t K>
 class ListNaive {
  private:
   std::list<sequence_t> seqs{};
-  Metadata<N> metadata;
 
  public:
+  Metadata<N> metadata;
+
   constexpr ListNaive() = default;
   constexpr ListNaive(const ListNaive &rhs) = default;
   constexpr ListNaive &operator=(const ListNaive &rhs) = default;
@@ -41,8 +42,12 @@ class ListNaive {
 
   constexpr std::size_t size() const { return seqs.size(); }
 
-  constexpr bool contains(const int8_t k, const sequence_t s) const {
+  constexpr bool contains(const sequence_t s) const {
     return std::find(seqs.cbegin(), seqs.cend(), s) != seqs.cend();
+  }
+
+  constexpr bool contains([[maybe_unused]] const int8_t k, const sequence_t s) const {
+    return contains(s);
   }
 
   constexpr void insert(const int8_t k, const sequence_t s) {
