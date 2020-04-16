@@ -7,12 +7,11 @@
 #include <vector>
 
 #include "../config/config.h"
-#include "BufferPool.h"
-#include "json.h"
-#include "metadataTree.h"
-#include "metric.h"
-#include "permutation.h"
+#include "sortnet/BufferPool.h"
+#include "sortnet/json.h"
+#include "sortnet/metric.h"
 #include "sortnet/networks/concept.h"
+#include "sortnet/permutation.h"
 #include "sortnet/sets/concept.h"
 #include "sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
 
@@ -261,4 +260,6 @@ class GenerateAndPrune {
 
   uint64_t pruneWithinFiles(uint8_t layer);
   uint64_t pruneAcrossFiles(uint8_t layer);
+
+  void printLayerSummary(uint8_t layer, double_t fileIODurationGen, double_t fileIODuration);
 };

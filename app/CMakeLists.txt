@@ -18,6 +18,18 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+  NAME tabulate
+  GITHUB_REPOSITORY p-ranav/tabulate
+  GIT_TAG origin/master
+)
+
+CPMAddPackage(
+  NAME progressbar
+  GITHUB_REPOSITORY andersfylling/progress-cpp
+  GIT_TAG origin/master
+)
+
+CPMAddPackage(
   NAME Sortnet
   SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..
 )
@@ -25,8 +37,9 @@ CPMAddPackage(
 # ---- Create standalone executable ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+FILE(GLOB headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
 
-add_executable(SortnetApp ${sources})
+add_executable(SortnetApp ${headers} ${sources})
 
 set_target_properties(SortnetApp PROPERTIES
   CXX_STANDARD 20
@@ -34,4 +47,4 @@ set_target_properties(SortnetApp PROPERTIES
   OUTPUT_NAME "Sortnet"
 )
 
-target_link_libraries(SortnetApp Sortnet cxxopts)
+target_link_libraries(SortnetApp Sortnet tabulate progress-cpp cxxopts)

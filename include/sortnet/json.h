@@ -5,7 +5,7 @@
 #undef at
 #endif
 
-#include "sortnet/vendors/github.com/nlohmann/json/json.hpp"
+#include <nlohmann/json.hpp>
 
 #ifdef at_removed
 #pragma pop_macro("at")
