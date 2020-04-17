@@ -5,10 +5,10 @@
 #include <limits>
 
 #include "sequence.h"
-#include "sortnet/sets/concept.h"
-
+#include "sortnet/concepts.h"
 #include "z_environment.h"
 
+namespace sortnet {
 constexpr uint64_t factorial(uint64_t n) {
   if (n == 0) {
     return 1;
@@ -82,21 +82,9 @@ constexpr uint8_t networkSizeUpperBound() {
   return size;
 }
 
-// these nice helper funcs (binary_read and binary_write) were inspired by:
-// https://baptiste-wicht.com/posts/2011/06/write-and-read-binary-files-in-c.html
-template <typename T>
-std::istream &binary_read(std::istream &f, T &value) {
-  return f.read(reinterpret_cast<char *>(&value), sizeof(T));
-}
-
-template <typename T>
-std::ostream &binary_write(std::ostream &f, const T &value) {
-  return f.write(reinterpret_cast<const char *>(&value), sizeof(T));
-}
-
-bool fileExists(const std::string &filename);
-
 double FloatPrecision(double v, double p);
 
-template <uint8_t N, SeqSet Set>
-std::string set_to_string(const Set &set);
+  // string representation of a set with ordered partitions
+  template <uint8_t N, concepts::Set set_t>
+  std::string to_string(set_t& set);
+}

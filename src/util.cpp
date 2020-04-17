@@ -1,34 +1,32 @@
-#include "sortnet/util.h"
+#include <sortnet/util.h>
 
-#include <sys/stat.h>
-
+#include <string>
 #include <bit>
 #include <cmath>
 #include <iostream>
 #include <sstream>
 
-bool fileExists(const std::string &filename) {
-  struct stat buffer;
-  return (stat(filename.c_str(), &buffer) == 0);
-}
-
+namespace sortnet {
 double FloatPrecision(double v, double p) { return (floor((v * pow(10, p) + 0.5)) / pow(10, p)); }
 
-template <uint8_t N, SeqSet Set>
-std::string set_to_string(const Set &set) {
+template <uint8_t N, concepts::Set set_t>
+std::string to_string(set_t& set) {
   std::stringstream ss{};
-  ss << "{";
-  for (auto k{1}; k < N; ++k) {
+  ss << "(";
+  for (auto k{0}; k < N-1; ++k) {
     ss << "{";
-    for (auto it{set.cbegin()}; it != set.cend(); ++it) {
-      const sequence_t s{*it};
-      if (std::popcount(s) != k) {
+    for (const sequence_t s : set) {
+      if (std::popcount(s)-1 != k) {
         continue;
       }
-      ss << ::sequence::binary::to_string<N>(s) << ",";
+      ss << sequence::binary::to_string<N>(s) << ",";
     }
-    ss << "}, ";
+    ss.seekp(-1, std::ios_base::end);
+    ss << "},";
   }
-  ss << "}";
+  ss.seekp(-1, std::ios_base::end);
+  ss << ")";
+
   return std::string(ss.str());
+}
 }

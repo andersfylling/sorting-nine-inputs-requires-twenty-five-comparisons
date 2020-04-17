@@ -53,7 +53,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const ui
       const auto netID{setBuf.at(i).metadata.netID};
       network = find(netID, netBuf.begin(), netBuf.begin() + nrOfNets);
 
-      for (const auto c : ::comparator::all<N>) {
+      for (const Comparator c : ::comparator::all<N>) {
         if (network.last() == c) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->RedundantComparatorQuick++;
@@ -65,7 +65,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const ui
         set.reset();
         for (auto s : setBuf.at(i)) {
           const auto k{std::popcount(s) - 1};
-          s = ::comparator::apply(c, s);
+          s = c.apply(s);
           set.insert(k, s);
         }
         if (set == setBuf.at(i)) {
@@ -75,10 +75,10 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const ui
           continue;
         }
 
-        network.add(c);
+        network.push_back(c);
         set.computeMeta();
         _f(network, set);
-        network.undo();
+        network.pop_back();
         ++counter;
       }
     }

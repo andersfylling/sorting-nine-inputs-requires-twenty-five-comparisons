@@ -66,7 +66,9 @@
 // custom types
 #include <cstdint>
 
-using segmentID_t = uint64_t;
+namespace sortnet {
+  using segmentID_t = uint64_t;
 
-// custom values
-constexpr uint32_t segment_capacity{SEGMENT_SIZE};
+  // custom values
+  constexpr uint32_t segment_capacity{SEGMENT_SIZE};
+}
