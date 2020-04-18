@@ -1,6 +1,8 @@
 #include <cxxopts.hpp>
 #include <iostream>
 
+#include "GenerateAndPrune.cpp" // TODO: cleanup
+
 int main(int argc, char** argv) {
   cxxopts::Options options(argv[0], "Generate and prune approach for finding the smallest sized sorting network for a sequence of N elements");
 

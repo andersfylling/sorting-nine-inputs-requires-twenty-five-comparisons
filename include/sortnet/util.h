@@ -7,6 +7,7 @@
 #include <bit>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #include "sequence.h"
 #include "sortnet/concepts.h"
@@ -86,7 +87,7 @@ constexpr uint8_t networkSizeUpperBound() {
   return size;
 }
 
-double FloatPrecision(double v, double p);
+double FloatPrecision(double v, double p) { return (floor((v * pow(10, p) + 0.5)) / pow(10, p)); }
 
   // string representation of a set with ordered partitions
   template <uint8_t N, concepts::Set set_t>
@@ -113,7 +114,7 @@ double FloatPrecision(double v, double p);
   // same as in papers => (from, to); (from, to); etc.
   std::string to_string(const Comparator c, const uint8_t N) {
     const auto base{N - 1};
-    return "(" + std::to_string(int(base - c.from)) + "," + std::to_string(int(base - c.to)) + ");";
+    return "(" + ::std::to_string(int(base - c.from)) + "," + ::std::to_string(int(base - c.to)) + ");";
   }
 
   template <concepts::ComparatorNetwork net_t>

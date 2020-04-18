@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include <progressbar/ProgressBar.hpp>
+#include <progresscpp/ProgressBar.hpp>
 
 class Progress {
 protected:
   static constexpr uint8_t width{45};
 
   std::string info;
-  ProgressBar bar;
+  progresscpp::ProgressBar bar;
 
   int prevProgress{-1};
   const unsigned int total_ticks;
@@ -37,7 +37,10 @@ public:
   uint64_t operator++() { ++ticks; return ++bar; }
   uint64_t operator+=(const int64_t increment) {
     ticks += increment;
-    return bar += increment;
+    for (auto i{0}; i < increment; ++i) {
+      ++bar; // TODO: improve..
+    }
+    return ticks;
   }
 
   void display() {

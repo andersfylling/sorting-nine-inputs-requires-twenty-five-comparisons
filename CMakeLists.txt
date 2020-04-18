@@ -76,7 +76,7 @@ FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/
 
 set(CMAKE_REQUIRED_FLAGS -fconcepts)
 
-add_library(Sortnet ${headers} ${sources})
+add_library(Sortnet STATIC ${headers} ${sources})
 
 set_target_properties(Sortnet PROPERTIES CXX_STANDARD 20)
 

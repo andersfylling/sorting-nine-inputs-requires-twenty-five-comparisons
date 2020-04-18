@@ -24,7 +24,7 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  NAME progressbar
+  NAME progresscpp
   GITHUB_REPOSITORY andersfylling/progress-cpp
   GIT_TAG origin/master
 )
@@ -64,4 +64,4 @@ endif()
 
 set(Boost_USE_STATIC_LIBS ON)
 
-target_link_libraries(SortnetApp Sortnet tabulate progress-cpp cxxopts)
+target_link_libraries(SortnetApp Sortnet tabulate progresscpp cxxopts)

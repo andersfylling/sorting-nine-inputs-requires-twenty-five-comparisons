@@ -256,6 +256,8 @@ class GenerateAndPrune {
   GenerateAndPrune() : pool(NrOfCores) {}
   ::sortnet::MetricsLayered<N, K> run();
 
+  template<typename Functor>
+  uint64_t read(const NetAndSetFilename& file, uint8_t layer, Functor&& _f);
   uint64_t generate(uint8_t layer);
 
   uint64_t pruneWithinFiles(uint8_t layer);

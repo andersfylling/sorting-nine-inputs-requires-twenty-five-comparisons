@@ -18,15 +18,14 @@
 // GENERATE
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
           typename Storage>
-uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const uint8_t layer) {
-  constexpr uint32_t FileSize{NetworksPerFileLimit};
+template<typename Functor>
+uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::read(const NetAndSetFilename& file, const uint8_t layer, Functor&& _f) {
+  constexpr uint32_t FileSize{::sortnet::segment_capacity};
 
-  std::vector<Set> setBuf(FileSize);
-  std::vector<Net> netBuf(FileSize);
-
-  uint64_t counter = 0;
+  std::vector<Set> sets(FileSize);
+  std::vector<Net> nets(FileSize);
 
   auto find = [](const uint64_t netID, auto it, const auto end) -> Net {
     for (; it != end; ++it) {
@@ -38,23 +37,58 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const ui
     throw std::logic_error("no network was not found for the given network id");
   };
 
-  Set set{};
-  Net network{};
-
-  const auto prevLayer{layer - 1};
-  for (const NetAndSetFilename &file : filenames) {
+  const auto nrOfNets = storage.Load(file.net, layer, nets.begin(), nets.end());
+  const auto nrOfSets = storage.Load(file.set, layer, sets.begin(), sets.end());
 #if (RECORD_INTERNAL_METRICS == 1)
-    metric->FileRead += 2;
+  metric->FileRead += 2;
 #endif
-    const auto nrOfNets = storage.Load(file.net, prevLayer, netBuf.begin(), netBuf.end());
-    const auto nrOfSets = storage.Load(file.set, prevLayer, setBuf.begin(), setBuf.end());
+  sets.resize(nrOfSets);
 
-    for (uint64_t i{0}; i < nrOfSets; ++i) {
-      const auto netID{setBuf.at(i).metadata.netID};
-      network = find(netID, netBuf.begin(), netBuf.begin() + nrOfNets);
+  for (const auto& set : sets) {
+    const auto netID{set->metadata.netID};
+    const auto& net = find(netID, nets.begin(), nets.begin() + nrOfNets);
+    _f(set, net);
+  }
 
-      for (const Comparator c : ::comparator::all<N>) {
-        if (network.last() == c) {
+  return nrOfSets; // nrOfNets contains pruned entities
+}
+
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
+          typename Storage>
+uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t layer) {
+  const auto existingFiles = std::move(filenames);
+  filenames.clear();  // TODO: redundant?
+
+  auto save = [&](const std::size_t size, auto itNets, const auto endNets, auto itSets,
+                  const auto endSets) -> void {
+    const auto netFile = storage.Save(layer, itNets, endNets);
+    const auto setFile = storage.Save(layer, itSets, endSets);
+#if (RECORD_INTERNAL_METRICS == 1)
+    metric->FileWrite += 2;
+#endif
+
+    filenames.emplace_back(NetAndSetFilename{
+        .net{netFile},
+        .set{setFile},
+    });
+  };
+
+#if (PRINT_PROGRESS == 1)
+  uint64_t filters = metrics.at(layer-1).filters();
+  Progress bar("generating", "files & clusters", filters);
+  bar.display();
+#endif
+
+  std::vector<Net> nets(::sortnet::segment_capacity);
+  std::vector<Set> sets(::sortnet::segment_capacity);
+
+  uint64_t counter{0};
+  uint64_t idCounter{0};
+  Set setBuffer{};
+  for (const auto &file : existingFiles) {
+    auto nrOfNetworks = this->read(file, layer, [&](const Net& net, const Set& set){
+      for (const ::sortnet::Comparator& c : ::sortnet::comparator::all<N>) {
+        if (net.back() == c) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->RedundantComparatorQuick++;
 #endif
@@ -62,135 +96,50 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(const ui
         }
 
         // apply new comparator and see if it causes a new change
-        set.reset();
-        for (auto s : setBuf.at(i)) {
+        setBuffer.reset();
+        for (auto s : set) {
           const auto k{std::popcount(s) - 1};
-          s = c.apply(s);
-          set.insert(k, s);
+          setBuffer.insert(k, c.apply(s));
         }
-        if (set == setBuf.at(i)) {
+        if (setBuffer == set) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->RedundantComparator++;
 #endif
           continue;
         }
 
-        network.push_back(c);
-        set.computeMeta();
-        _f(network, set);
-        network.pop_back();
+        nets.at(counter) = net;
+        nets.at(counter).id = idCounter;
+        nets.at(counter).push_back(c);
+        sets.at(counter) = set;
+        sets.at(counter).metadata.id = idCounter;
+        sets.at(counter).computeMeta();
         ++counter;
-      }
-    }
-  }
+        ++idCounter;
 
-  return counter;
-}
-
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
-          typename Storage>
-uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generateAsClusterBySize(uint8_t layer) {
-  std::map<std::size_t, NetAndSet<NetworksPerFileLimit, Set, Net>> buffers{};
-
-  const auto existingFiles = std::move(filenames);
-  filenames.clear();  // TODO: redundant?
-
-  uint64_t id = 0;
-  auto setNetID = [&](auto itNets, const auto endNets, auto itSets) {
-    // link networks and sets by network id
-    for (; itNets != endNets; ++itNets, ++itSets) {
-      itNets->id    = id;
-      itSets->metadata.netID = id;
-      ++id;
-    }
-  };
-
-  auto save = [&](const std::size_t size, auto itNets, const auto endNets, auto itSets,
-                  const auto endSets) -> void {
-#if (RECORD_INTERNAL_METRICS == 1)
-    metric->FileWrite += 2;
-#endif
-
-    // save to files
-    const auto netFile = storage.Save(layer, itNets, endNets);
-    const auto setFile = storage.Save(layer, itSets, endSets);
-    const auto pair    = NetAndSetFilename{
-        .net{netFile},
-        .set{setFile},
-    };
-
-    // update cluster
-    for (auto &cluster : filenames) {
-      if (cluster.size != size) {
-        continue;
-      }
-
-      cluster.files.push_back(pair);
-    }
-  };
-
-#if (PRINT_PROGRESS == 1)
-  Progress bar("generating :: files & clusters    ", existingFiles.size(), 45);
-  bar.display();
-#endif
-
-  for (const auto &cluster : existingFiles) {
-    generate(cluster.files, layer, [&](const Net& net, const Set& set){
-      const auto key{set.size()};
-      if (!buffers.contains(key)) {
-        // add new buffer
-        buffers.insert({key, {}});
-
-        // add new cluster
-        const auto lower = std::upper_bound(filenames.cbegin(), filenames.cend(), key,
-                                            [](const auto size, const auto &cluster) -> bool {
-                                              return cluster.size >= size;
-                                            });
-        filenames.insert(lower, {.size{key}});
-      }
-
-      auto &buffer = buffers.at(key);
-
-      if (buffer.add(net, set) == buffer.cend()) {
-        setNetID(
-            buffer.nets.begin(), buffer.nets.cend(),
-            buffer.sets.begin());
-        save(key,
-             buffer.nets.cbegin(), buffer.nets.cend(),
-             buffer.sets.cbegin(), buffer.sets.cend());
-        buffer.clear();
+        if (counter == ::sortnet::segment_capacity) {
+          save(nets.cbegin(), nets.cend(),
+               sets.cbegin(), sets.cend());
+          counter = 0;
+        }
       }
     });
 #if (PRINT_PROGRESS == 1)
-    ++bar;
+    bar += nrOfNetworks;
     bar.display();
 #endif
   }
 
   // check if there is anything else to write to file
-  for (auto &pair : buffers) {
-    auto &buffer = pair.second;
-    if (buffer.size == 0) {
-      continue;
-    }
-
-    const auto key = pair.first;
-    setNetID(
-        buffer.nets.begin(), buffer.nets.cbegin() + buffer.size,
-        buffer.sets.begin());
-    save(key,
-         buffer.nets.cbegin(), buffer.nets.cbegin() + buffer.size,
-         buffer.sets.cbegin(), buffer.sets.cbegin() + buffer.size);
-    buffer.clear();
+  if (counter > 0) {
+    save(nets.cbegin(), nets.cend(),
+         sets.cbegin(), sets.cend());
   }
 #if (PRINT_PROGRESS == 1)
   bar.done();
 #endif
 
-#if (RECORD_INTERNAL_METRICS == 1)
-  metric->sizeClusters = buffers.size();
-#endif
-  return id;
+  return idCounter;
 }
 
 /////////////////////
@@ -198,7 +147,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generateAsCluster
 // PRUNE
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
           typename Storage>
 uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(uint8_t layer) {
   auto prune = [&](const std::string& filename, auto begin, auto end) -> uint32_t {
@@ -274,11 +223,14 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(
   return pruned;
 }
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
           typename Storage>
 uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(uint8_t layer) {
 #if (PRINT_PROGRESS == 1)
   std::mutex m;
+
+  Progress bar("pruning", "within files", filenames.size());
+  bar.display();
 #endif
 
   auto updateProgress = [&]() -> void {
@@ -318,11 +270,6 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(
     return originalSize - size;
   };
 
-#if (PRINT_PROGRESS == 1)
-  Progress bar("pruning", "within files", filenames.size());
-  bar.display();
-#endif
-
   std::vector<std::future<uint64_t>> results{};
   for (const auto &file : filenames) {
     results.emplace_back(pool.add(prune, file));
@@ -348,9 +295,9 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(
 // RUN
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
           typename Storage>
-MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run() {
+::sortnet::MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run() {
   metric = &metrics.at(0);
 
   auto microsecondsToSeconds = [](const double_t mcs){
@@ -392,7 +339,6 @@ MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run()
 #endif
       generated += generate(layer);
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->Generated = generated;
       metric->DurationGenerating = duration(start, now());
 #endif
     }
@@ -412,7 +358,6 @@ MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run()
       const auto d = duration(start, end);
 
       metric->prunedWithinFile = pruned;
-      metric->Pruned += pruned;
 
       metric->durationPruningWithinFile = d;
       metric->DurationPruning += d;
@@ -429,24 +374,33 @@ MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run()
       const auto d = duration(start, end);
 
       metric->prunedAcrossClusters = pruned;
-      metric->Pruned += pruned;
 
       metric->durationPruningAcrossClusters = d;
       metric->DurationPruning += d;
 #endif
     }
 
+    // always record the nr of pruned and generated networks
+    metric->Generated = generated;
+    metric->Pruned += pruned;
+
 #if (RECORD_IO_TIME == 1)
     const auto fileIODuration = nanosecondsToSeconds(storage.duration);
     storage.duration = 0;
 
+#if (PRINT_LAYER_SUMMARY == 1)
     printLayerSummary(layer, fileIODurationGen, fileIODuration);
+#endif
+#else
+#if (PRINT_LAYER_SUMMARY == 1)
+    printLayerSummary(layer, 0, 0);
+#endif
 #endif
 
     // in case the program needs to terminate before we had planned,
     // at least we have the metrics
 #if (SAVE_METRICS == 1)
-    const auto json = metrics.to_json(NrOfCores, NetworksPerFileLimit);
+    const auto json = metrics.to_json(NrOfCores, ::sortnet::segment_capacity);
     storage.Save("metrics.json", json);
 #endif
   }
@@ -454,7 +408,7 @@ MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run()
   return metrics;
 }
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, typename Set, typename Net, typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 void
 GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t layer, double_t fileIODurationGen, double_t fileIODuration) {
   auto dec = [](const double_t v) -> std::string {
@@ -462,7 +416,7 @@ GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t 
     return std::to_string(v).substr(0, std::to_string(v).find(".") + precision + 1);
   };
 
-  Table t;
+  tabulate::Table t;
   t.add_row({"", "Time", "Filters", "IO Time"});
   std::size_t columns{4};
 
@@ -488,15 +442,15 @@ GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t 
   t.add_row({"Total so far", dec(metrics.Seconds()) + "s","-", ioTime});
 
   for (std::size_t i{1}; i < columns; ++i) {
-    t.column(i).format().font_align(FontAlign::right);
+    t.column(i).format().font_align(tabulate::FontAlign::right);
   }
 
   // center-align and color header cells
   for (std::size_t i{0}; i < columns; ++i) {
     t[0][i].format()
-        .font_color(Color::yellow)
-        .font_align(FontAlign::center)
-        .font_style({FontStyle::bold});
+        .font_color(tabulate::Color::yellow)
+        .font_align(tabulate::FontAlign::center)
+        .font_style({tabulate::FontStyle::bold});
   }
 
   std::cout << std::endl << t << std::endl;

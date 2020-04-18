@@ -62,6 +62,10 @@ namespace sortnet {
     double durationPruningWithinCluster{0};
     double durationPruningAcrossClusters{0};
 
+    [[nodiscard]] constexpr uint64_t filters() const {
+      return Generated - Pruned;
+    }
+
     [[nodiscard]] std::string to_string() const;
     void to_json(::nlohmann::json &j) const;
   };
