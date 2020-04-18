@@ -1,8 +1,7 @@
 #pragma once
 
-#include <string>
-
 #include <progresscpp/ProgressBar.hpp>
+#include <string>
 
 class Progress {
 protected:
@@ -15,12 +14,11 @@ protected:
   const unsigned int total_ticks;
   unsigned int ticks = 0;
 
-  void print() const {
-    std::cout << info << " ";
-  }
+  void print() const { std::cout << info << " "; }
 
 public:
-  Progress(const std::string& prefix, const std::string& suffix, uint64_t total) : bar(total, width), total_ticks(total) {
+  Progress(const std::string& prefix, const std::string& suffix, uint64_t total)
+      : bar(total, width), total_ticks(total) {
     const auto w{35};
 
     // <category> :: <description> [==>...
@@ -34,18 +32,21 @@ public:
     info += suffix;
   }
 
-  uint64_t operator++() { ++ticks; return ++bar; }
+  uint64_t operator++() {
+    ++ticks;
+    return ++bar;
+  }
   uint64_t operator+=(const int64_t increment) {
     ticks += increment;
     for (auto i{0}; i < increment; ++i) {
-      ++bar; // TODO: improve..
+      ++bar;  // TODO: improve..
     }
     return ticks;
   }
 
   void display() {
-    float progress = (float) ticks / total_ticks;
-    int pos = (int) ((int)width * progress);
+    float progress = (float)ticks / total_ticks;
+    int pos = (int)((int)width * progress);
     if (prevProgress > 50 && prevProgress == pos) {
       return;
     }

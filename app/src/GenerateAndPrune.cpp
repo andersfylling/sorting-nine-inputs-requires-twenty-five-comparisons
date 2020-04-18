@@ -18,10 +18,12 @@
 // GENERATE
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
-template<typename Functor>
-uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::read(const NetAndSetFilename& file, const uint8_t layer, Functor&& _f) {
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
+template <typename Functor>
+uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::read(const NetAndSetFilename& file,
+                                                                    const uint8_t layer,
+                                                                    Functor&& _f) {
   constexpr uint32_t FileSize{::sortnet::segment_capacity};
 
   std::vector<Set> sets(FileSize);
@@ -50,11 +52,11 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::read(const NetAnd
     _f(set, net);
   }
 
-  return nrOfSets; // nrOfNets contains pruned entities
+  return nrOfSets;  // nrOfNets contains pruned entities
 }
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t layer) {
   const auto existingFiles = std::move(filenames);
   filenames.clear();  // TODO: redundant?
@@ -74,7 +76,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t 
   };
 
 #if (PRINT_PROGRESS == 1)
-  uint64_t filters = metrics.at(layer-1).filters();
+  uint64_t filters = metrics.at(layer - 1).filters();
   Progress bar("generating", "files & clusters", filters);
   bar.display();
 #endif
@@ -85,8 +87,8 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t 
   uint64_t counter{0};
   uint64_t idCounter{0};
   Set setBuffer{};
-  for (const auto &file : existingFiles) {
-    auto nrOfNetworks = this->read(file, layer, [&](const Net& net, const Set& set){
+  for (const auto& file : existingFiles) {
+    auto nrOfNetworks = this->read(file, layer, [&](const Net& net, const Set& set) {
       for (const ::sortnet::Comparator& c : ::sortnet::comparator::all<N>) {
         if (net.back() == c) {
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -118,8 +120,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t 
         ++idCounter;
 
         if (counter == ::sortnet::segment_capacity) {
-          save(nets.cbegin(), nets.cend(),
-               sets.cbegin(), sets.cend());
+          save(nets.cbegin(), nets.cend(), sets.cbegin(), sets.cend());
           counter = 0;
         }
       }
@@ -132,8 +133,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t 
 
   // check if there is anything else to write to file
   if (counter > 0) {
-    save(nets.cbegin(), nets.cend(),
-         sets.cbegin(), sets.cend());
+    save(nets.cbegin(), nets.cend(), sets.cbegin(), sets.cend());
   }
 #if (PRINT_PROGRESS == 1)
   bar.done();
@@ -147,39 +147,38 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::generate(uint8_t 
 // PRUNE
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(uint8_t layer) {
   auto prune = [&](const std::string& filename, auto begin, auto end) -> uint32_t {
     auto* buffer = buffers.get();
     auto begin2 = buffer->setsFirst.begin();
 
-      auto size = storage.Load(filename, layer, begin2, buffer->setsFirst.end());
+    auto size = storage.Load(filename, layer, begin2, buffer->setsFirst.end());
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->FileRead++;
+    metric->FileRead++;
 #endif
-      if (size == 0) {
-        buffers.put(buffer);
-        return 0;
-      }
-      const auto sizeBeforePruning{size};
-
-      auto end2 = begin2 + size;
-      markRedundantNetworks(begin, end, begin2, end2);
-      size = shiftRedundant(begin2, end2);
-
-      // write results to file if anything changed
-      const uint32_t pruned = sizeBeforePruning - size;
-      if (pruned > 0) {
-        storage.Save(filename, begin2, begin2 + size);
-#if (RECORD_INTERNAL_METRICS == 1)
-        metric->FileWrite++;
-#endif
-      }
+    if (size == 0) {
       buffers.put(buffer);
-      return pruned;
-  };
+      return 0;
+    }
+    const auto sizeBeforePruning{size};
 
+    auto end2 = begin2 + size;
+    markRedundantNetworks(begin, end, begin2, end2);
+    size = shiftRedundant(begin2, end2);
+
+    // write results to file if anything changed
+    const uint32_t pruned = sizeBeforePruning - size;
+    if (pruned > 0) {
+      storage.Save(filename, begin2, begin2 + size);
+#if (RECORD_INTERNAL_METRICS == 1)
+      metric->FileWrite++;
+#endif
+    }
+    buffers.put(buffer);
+    return pruned;
+  };
 
 #if (PRINT_PROGRESS == 1)
   // TODO: n'th triangle number
@@ -192,7 +191,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(
   std::vector<std::future<uint32_t>> results{};
   uint64_t pruned{0};
   for (std::size_t i{0}; i < filenames.size(); ++i) {
-    const auto &file{filenames.at(i)};
+    const auto& file{filenames.at(i)};
     auto size = storage.Load(file.set, layer, sets.begin(), sets.end());
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->FileRead++;
@@ -213,7 +212,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(
     results.clear();
 #if (PRINT_PROGRESS == 1)
     ++bar;
-      bar.display();
+    bar.display();
 #endif
   }
 #if (PRINT_PROGRESS == 1)
@@ -223,8 +222,8 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneAcrossFiles(
   return pruned;
 }
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(uint8_t layer) {
 #if (PRINT_PROGRESS == 1)
   std::mutex m;
@@ -241,7 +240,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(
 #endif
   };
 
-  auto prune = [&](const auto &file) -> uint64_t {
+  auto prune = [&](const auto& file) -> uint64_t {
     auto* buffer = buffers.get();
     auto begin = buffer->setsFirst.begin();
     auto end = buffer->setsFirst.end();
@@ -271,7 +270,7 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(
   };
 
   std::vector<std::future<uint64_t>> results{};
-  for (const auto &file : filenames) {
+  for (const auto& file : filenames) {
     results.emplace_back(pool.add(prune, file));
   }
 
@@ -289,31 +288,25 @@ uint64_t GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::pruneWithinFiles(
   return pruned;
 }
 
-
 /////////////////////
 //
 // RUN
 //
 ////////////////////
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 ::sortnet::MetricsLayered<N, K> GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::run() {
   metric = &metrics.at(0);
 
-  auto microsecondsToSeconds = [](const double_t mcs){
-    return mcs / 1000000.0;
-  };
-  auto nanosecondsToSeconds = [](const double_t ns){
-    return ns / 1000000000.0;
-  };
+  auto microsecondsToSeconds = [](const double_t mcs) { return mcs / 1000000.0; };
+  auto nanosecondsToSeconds = [](const double_t ns) { return ns / 1000000000.0; };
   auto duration = [&](auto start, auto end) {
     const auto d = end - start;
     const auto mcs = std::chrono::duration_cast<std::chrono::microseconds>(d).count();
     return microsecondsToSeconds(mcs);
   };
-  auto now = []() -> std::chrono::steady_clock::time_point {
-    return std::chrono::steady_clock::now();
-  };
+  auto now
+      = []() -> std::chrono::steady_clock::time_point { return std::chrono::steady_clock::now(); };
 
   // #############################################
   //
@@ -327,13 +320,11 @@ template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
     std::cout << std::endl
               << "======== N" << int(N) << "K" << int(layer)
               << " =========================================="
-              << "==========================================="
-              << std::endl;
+              << "===========================================" << std::endl;
 #endif
 
-
     uint64_t generated{0};
-    { // GENERATE NETWORKS AND OUTPUT SETS
+    {  // GENERATE NETWORKS AND OUTPUT SETS
 #if (RECORD_INTERNAL_METRICS == 1)
       const auto start = now();
 #endif
@@ -348,13 +339,13 @@ template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
 #endif
 
     uint64_t pruned{0};
-    { // PRUNE WITHIN FILES
+    {  // PRUNE WITHIN FILES
 #if (RECORD_INTERNAL_METRICS == 1)
       const auto start = now();
 #endif
       pruned += pruneWithinFiles(layer);
 #if (RECORD_INTERNAL_METRICS == 1)
-      const auto end    = now();
+      const auto end = now();
       const auto d = duration(start, end);
 
       metric->prunedWithinFile = pruned;
@@ -364,13 +355,13 @@ template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
 #endif
     }
 
-    { // PRUNE ACROSS FILES
+    {  // PRUNE ACROSS FILES
 #if (RECORD_INTERNAL_METRICS == 1)
       const auto start = now();
 #endif
       pruned += pruneAcrossFiles(layer);
 #if (RECORD_INTERNAL_METRICS == 1)
-      const auto end    = now();
+      const auto end = now();
       const auto d = duration(start, end);
 
       metric->prunedAcrossClusters = pruned;
@@ -388,13 +379,13 @@ template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
     const auto fileIODuration = nanosecondsToSeconds(storage.duration);
     storage.duration = 0;
 
-#if (PRINT_LAYER_SUMMARY == 1)
+#  if (PRINT_LAYER_SUMMARY == 1)
     printLayerSummary(layer, fileIODurationGen, fileIODuration);
-#endif
+#  endif
 #else
-#if (PRINT_LAYER_SUMMARY == 1)
+#  if (PRINT_LAYER_SUMMARY == 1)
     printLayerSummary(layer, 0, 0);
-#endif
+#  endif
 #endif
 
     // in case the program needs to terminate before we had planned,
@@ -408,9 +399,10 @@ template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
   return metrics;
 }
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
-void
-GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t layer, double_t fileIODurationGen, double_t fileIODuration) {
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
+void GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(
+    uint8_t layer, double_t fileIODurationGen, double_t fileIODuration) {
   auto dec = [](const double_t v) -> std::string {
     const auto precision = 2;
     return std::to_string(v).substr(0, std::to_string(v).find(".") + precision + 1);
@@ -424,22 +416,25 @@ GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t 
 #if (RECORD_IO_TIME == 1)
   ioTime = dec(fileIODurationGen);
 #endif
-  t.add_row({"Generating", dec(metric->DurationGenerating) + "s", std::to_string(metric->Generated), ioTime});
+  t.add_row({"Generating", dec(metric->DurationGenerating) + "s", std::to_string(metric->Generated),
+             ioTime});
 
 #if (RECORD_IO_TIME == 1)
   ioTime = "-";
 #endif
-  t.add_row({"Pruning", dec(metric->DurationPruning) + "s", std::to_string(metric->Pruned), ioTime});
+  t.add_row(
+      {"Pruning", dec(metric->DurationPruning) + "s", std::to_string(metric->Pruned), ioTime});
 
 #if (RECORD_IO_TIME == 1)
   ioTime = dec(fileIODuration);
 #endif
-  t.add_row({"Sum", dec(metric->DurationGenerating + metric->DurationPruning) + "s", std::to_string(metric->Generated - metric->Pruned), ioTime});
+  t.add_row({"Sum", dec(metric->DurationGenerating + metric->DurationPruning) + "s",
+             std::to_string(metric->Generated - metric->Pruned), ioTime});
 
 #if (RECORD_IO_TIME == 1)
   ioTime = "-";
 #endif
-  t.add_row({"Total so far", dec(metrics.Seconds()) + "s","-", ioTime});
+  t.add_row({"Total so far", dec(metrics.Seconds()) + "s", "-", ioTime});
 
   for (std::size_t i{1}; i < columns; ++i) {
     t.column(i).format().font_align(tabulate::FontAlign::right);
@@ -447,7 +442,8 @@ GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>::printLayerSummary(uint8_t 
 
   // center-align and color header cells
   for (std::size_t i{0}; i < columns; ++i) {
-    t[0][i].format()
+    t[0][i]
+        .format()
         .font_color(tabulate::Color::yellow)
         .font_align(tabulate::FontAlign::center)
         .font_style({tabulate::FontStyle::bold});

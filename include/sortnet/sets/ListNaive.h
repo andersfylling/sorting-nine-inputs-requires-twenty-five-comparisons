@@ -1,13 +1,13 @@
 #pragma once
 
+#include <sortnet/sets/Metadata.h>
+#include <sortnet/z_environment.h>
+
 #include <algorithm>
 #include <list>
 
-#include <sortnet/sets/Metadata.h>
-#include "sortnet/sequence.h"
 #include "sortnet/permutation.h"
-
-#include <sortnet/z_environment.h>
+#include "sortnet/sequence.h"
 
 namespace sortnet {
   namespace set {
@@ -117,5 +117,5 @@ namespace sortnet {
         }
       }
     };
-  }
-}
+  }  // namespace set
+}  // namespace sortnet

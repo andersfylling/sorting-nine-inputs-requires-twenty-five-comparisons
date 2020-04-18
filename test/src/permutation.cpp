@@ -1,4 +1,5 @@
 #include <doctest/doctest.h>
+
 #include <bitset>
 
 #define UNIT_TEST 1
@@ -10,8 +11,7 @@
 #include "sortnet/permutation.h"
 #include "utilTest.h"
 
-template <uint8_t N>
-using permutation_t = ::sortnet::permutation::permutation_t<N>;
+template <uint8_t N> using permutation_t = ::sortnet::permutation::permutation_t<N>;
 using sequence_t = ::sortnet::sequence_t;
 
 TEST_CASE("apply a permutation to a sequence") {
@@ -57,7 +57,7 @@ TEST_CASE("incorrect permutation of outputs") {
   set_t Ob{};
 
   constexpr sequence_t mask{::sortnet::sequence::binary::genMask<N>()};
-  constexpr auto       max = std::numeric_limits<sequence_t>::max() & mask;
+  constexpr auto max = std::numeric_limits<sequence_t>::max() & mask;
   for (sequence_t s{1}; s < max; s++) {
     const auto k{std::popcount(s) - 1};
     Oa.insert(k, A.run(s));
@@ -74,7 +74,7 @@ TEST_CASE("apply permutation") {
   constexpr uint8_t N{5};
 
   const sequence_t s{0b10111};
-  const auto       p{perm<N>({1, 0, 2, 3, 4})};
+  const auto p{perm<N>({1, 0, 2, 3, 4})};
   const sequence_t permuted = ::sortnet::permutation::apply<N>(p, s);
 
   REQUIRE_FALSE(s == permuted);
@@ -102,12 +102,10 @@ TEST_CASE("find permutations given constraints") {
   };
 
   std::vector<::sortnet::permutation::permutation_t<N>> got{};
-  ::sortnet::permutation::generate<N>(
-      constraints,
-      [&](const auto &p) -> bool {
-        got.push_back(p);
-        return false;
-      });
+  ::sortnet::permutation::generate<N>(constraints, [&](const auto &p) -> bool {
+    got.push_back(p);
+    return false;
+  });
   const std::vector<::sortnet::permutation::permutation_t<N>> wants{
       {2, 4, 3, 1, 0},
       {2, 4, 3, 0, 1},
@@ -166,9 +164,8 @@ TEST_CASE("subsumes by perfect matching on partition sets") {
   // note that this permutation looks at the sequences
   // from left to right.
   const bool success = ::sortnet::permutation::generate<N>(
-      constraints,
-      [&](const ::sortnet::permutation::permutation_t<N> &p) {
+      constraints, [&](const ::sortnet::permutation::permutation_t<N> &p) {
         return ::sortnet::permutation::subsumes<N>(p, A, B);
       });
-      REQUIRE(success);
+  REQUIRE(success);
 }

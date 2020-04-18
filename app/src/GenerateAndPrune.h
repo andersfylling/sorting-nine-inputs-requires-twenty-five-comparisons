@@ -1,40 +1,37 @@
 #pragma once
 
+#include <sortnet/BufferPool.h>
+#include <sortnet/concepts.h>
+#include <sortnet/json.h>
+#include <sortnet/metric.h>
+#include <sortnet/permutation.h>
+#include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
+#include <sortnet/z_environment.h>
+
 #include <array>
 #include <bit>
 #include <iostream>
 #include <list>
 #include <vector>
 
-#include <sortnet/BufferPool.h>
-#include <sortnet/json.h>
-#include <sortnet/metric.h>
-#include <sortnet/concepts.h>
-#include <sortnet/permutation.h>
-#include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
-
-#include <sortnet/z_environment.h>
-
 struct NetAndSetFilename {
   const std::string net;
   const std::string set;
 };
 
-template <std::size_t limit, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net>
+template <std::size_t limit, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net>
 class NetAndSet {
- public:
-  std::size_t      size{0};
+public:
+  std::size_t size{0};
   std::vector<Set> sets{};
   std::vector<Net> nets{};
-
 
   using const_iterator = typename std::vector<Set>::const_iterator;
 
   NetAndSet() : sets(limit), nets(limit) {}
 
-  const_iterator cend() const noexcept {
-    return sets.cend();
-  }
+  const_iterator cend() const noexcept { return sets.cend(); }
 
   const_iterator add(const Net &net, const Set &set) {
     sets.at(size) = set;
@@ -51,27 +48,27 @@ class NetAndSet {
   }
 };
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
-          typename Storage>
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set,
+          ::sortnet::concepts::ComparatorNetwork Net, typename Storage>
 class GenerateAndPrune {
- private:
-  static const auto           FileLimit{::sortnet::segment_capacity * 2};  // ugly
+private:
+  static const auto FileLimit{::sortnet::segment_capacity * 2};  // ugly
   std::vector<NetAndSetFilename> filenames{};
   Storage storage{};
 
   ::sortnet::BufferPool<Set, Net, NrOfCores, ::sortnet::segment_capacity> buffers{};
 
   ::sortnet::MetricsLayered<N, K> metrics{};
-  ::sortnet::MetricLayer *        metric = &metrics.at(0);
+  ::sortnet::MetricLayer *metric = &metrics.at(0);
 
   ::dbr::cc::ThreadPool pool;
 
   constexpr void storeEmptyNetworkWithOutputSet() {
     // we store an empty network and a complete output set
     std::array<Net, 1> _networks{};
-    auto& net{_networks.at(0)};
+    auto &net{_networks.at(0)};
     std::array<Set, 1> _sets{};
-    auto& set{_sets.at(0)};
+    auto &set{_sets.at(0)};
 
     // cleanup
     net.clear();
@@ -86,7 +83,7 @@ class GenerateAndPrune {
       const auto k{std::popcount(s) - 1};
       set.insert(k, s);
     }
-    set.computeMeta(); // compute metadata, if needed...
+    set.computeMeta();  // compute metadata, if needed...
 
     // store
     const auto layer{0};
@@ -103,13 +100,12 @@ class GenerateAndPrune {
   }
 
   // group together the unmarked sets
-  template <typename _II, typename _II2>
-  constexpr uint64_t shiftRedundant(_II it, const _II2 end) {
+  template <typename _II, typename _II2> constexpr uint64_t shiftRedundant(_II it, const _II2 end) {
     // prune away marked sets by shifting those of interest
     // to the left and decreasing the size.
     auto counter{0};
     bool skewed{false};
-    _II  it2 = it;
+    _II it2 = it;
     for (; it != end; ++it) {
       if (it->metadata.marked) {
         skewed = true;
@@ -143,8 +139,7 @@ class GenerateAndPrune {
 #endif
 
     return ::sortnet::permutation::generate<N>(
-        constraints,
-        [&](const ::sortnet::permutation::permutation_t<N> &p) {
+        constraints, [&](const ::sortnet::permutation::permutation_t<N> &p) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->Permutations++;
 #endif
@@ -209,8 +204,7 @@ class GenerateAndPrune {
   }
 
   // mark redundant sets within a file
-  template<typename II>
-  constexpr void markRedundantNetworks(II it, const II end) const {
+  template <typename II> constexpr void markRedundantNetworks(II it, const II end) const {
     for (; it != end; ++it) {
       Set setA{*it};
       if (setA.metadata.marked) {
@@ -231,8 +225,9 @@ class GenerateAndPrune {
   }
 
   // mark redundant sets across two files
-  template<typename II>
-  constexpr void markRedundantNetworks(const II begin1, const II end1, const II begin2, const II end2) const {
+  template <typename II> constexpr void markRedundantNetworks(const II begin1, const II end1,
+                                                              const II begin2,
+                                                              const II end2) const {
     for (II it1{begin1}; it1 != end1; ++it1) {
       Set setA{*it1};
       if (setA.metadata.marked) {
@@ -252,12 +247,12 @@ class GenerateAndPrune {
     }
   }
 
- public:
+public:
   GenerateAndPrune() : pool(NrOfCores) {}
   ::sortnet::MetricsLayered<N, K> run();
 
-  template<typename Functor>
-  uint64_t read(const NetAndSetFilename& file, uint8_t layer, Functor&& _f);
+  template <typename Functor>
+  uint64_t read(const NetAndSetFilename &file, uint8_t layer, Functor &&_f);
   uint64_t generate(uint8_t layer);
 
   uint64_t pruneWithinFiles(uint8_t layer);

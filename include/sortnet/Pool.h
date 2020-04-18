@@ -35,4 +35,4 @@ namespace sortnet {
       objects.push_back(obj);
     }
   };
-}
+}  // namespace sortnet

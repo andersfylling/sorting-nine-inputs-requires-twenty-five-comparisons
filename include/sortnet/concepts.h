@@ -5,18 +5,19 @@
 
 namespace sortnet {
   namespace concepts {
-    template <class T>
-    concept ComparatorNetwork = requires(T net, sequence_t s, Comparator c) {
-      { net.size() } -> std::size_t;
+    template <class T> concept ComparatorNetwork = requires(T net, sequence_t s, Comparator c) {
+      { net.size() }
+      ->std::size_t;
       {net.clear()};
-      {net.back()} -> Comparator;
+      { net.back() }
+      ->Comparator;
       {net.pop_back()};
       {net.push_back(c)};
-      { net.run(s) } -> sequence_t;
+      { net.run(s) }
+      ->sequence_t;
     };
 
-    template <class T>
-    concept Set = requires(T set, T other, uint8_t k, sequence_t s) {
+    template <class T> concept Set = requires(T set, T other, uint8_t k, sequence_t s) {
       { set.size() }
       ->std::size_t;
       { set.contains(k, s) }
@@ -25,9 +26,9 @@ namespace sortnet {
       ->bool;
       { set.subsumes(other) }
       ->bool;
-      { set.insert(k, s) };
-      { set.clear() };
-      { set.computeMeta() };
+      {set.insert(k, s)};
+      {set.clear()};
+      {set.computeMeta()};
     };
-  }
-}
+  }  // namespace concepts
+}  // namespace sortnet

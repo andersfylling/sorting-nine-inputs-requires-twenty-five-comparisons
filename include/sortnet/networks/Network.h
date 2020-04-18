@@ -1,12 +1,11 @@
 #pragma once
 
-#include <vector>
 #include <string>
-
-#include "sortnet/comparator.h"
-#include "sortnet/io.h"
+#include <vector>
 
 #include "../z_environment.h"
+#include "sortnet/comparator.h"
+#include "sortnet/io.h"
 
 namespace sortnet {
   namespace network {
@@ -21,7 +20,8 @@ namespace sortnet {
           throw std::logic_error("this network can not fit any more comparators");
         }
 
-        if (c.empty() || !(c.from >= 0 && c.from < N) || !(c.to >= 0 && c.to < N) || c.from <= c.to) {
+        if (c.empty() || !(c.from >= 0 && c.from < N) || !(c.to >= 0 && c.to < N)
+            || c.from <= c.to) {
           throw std::logic_error("comparator is invalid according to spec");
         }
         addUnsafe(c);
@@ -107,5 +107,5 @@ namespace sortnet {
         }
       }
     };
-  }
-  }
+  }  // namespace network
+}  // namespace sortnet

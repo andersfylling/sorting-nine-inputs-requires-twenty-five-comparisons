@@ -1,11 +1,11 @@
 #pragma once
 
-#include <array>
-#include <bitset>
-#include <bit>
-#include <string>
-
 #include <sortnet/bits.h>
+
+#include <array>
+#include <bit>
+#include <bitset>
+#include <string>
 
 #include "z_environment.h"
 
@@ -94,4 +94,4 @@ namespace sortnet {
 
   // default
   using sequence_t = sequence::binary::sequence_t;
-}
+}  // namespace sortnet

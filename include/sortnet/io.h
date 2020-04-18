@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ostream>
 #include <istream>
+#include <ostream>
 #include <string>
 
 namespace sortnet {
@@ -17,4 +17,4 @@ namespace sortnet {
   }
 
   bool fileExists(const std::string &filename);
-}
+}  // namespace sortnet

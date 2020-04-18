@@ -1,11 +1,12 @@
 #pragma once
 
+#include <sortnet/z_environment.h>
+
 #include <array>
 #include <bit>
 
-#include "sortnet/sequence.h"
 #include "sortnet/io.h"
-#include <sortnet/z_environment.h>
+#include "sortnet/sequence.h"
 
 namespace sortnet::set {
   template <uint8_t N> class Metadata {
@@ -78,4 +79,4 @@ namespace sortnet::set {
     }
   };
 
-}
+}  // namespace sortnet::set

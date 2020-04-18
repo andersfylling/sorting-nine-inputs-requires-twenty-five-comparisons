@@ -1,4 +1,5 @@
 #include <doctest/doctest.h>
+
 #include <iostream>
 #include <string>
 
@@ -13,9 +14,8 @@
 
 #include "utilTest.h"
 
-auto removeSpaces = [](auto &str) {
-  str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
-};
+auto removeSpaces
+    = [](auto &str) { str.erase(remove_if(str.begin(), str.end(), isspace), str.end()); };
 
 TEST_CASE("Subsuming check") {
   /*

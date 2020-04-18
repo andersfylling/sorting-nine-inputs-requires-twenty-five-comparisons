@@ -1,18 +1,16 @@
 #pragma once
 
 #include <array>
+#include <boost/filesystem.hpp>
 #include <chrono>
+#include <fstream>
+#include <iomanip>
 #include <map>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <iomanip>
-#include <fstream>
 
-#include "sortnet/io.h"
-
-#include "sortnet/json.h"
 #include "sortnet/concepts.h"
-
+#include "sortnet/io.h"
+#include "sortnet/json.h"
 #include "sortnet/z_environment.h"
 
 namespace sortnet {
@@ -108,7 +106,7 @@ namespace sortnet {
       f.close();
 #if (RECORD_IO_TIME == 1)
       const auto stop = std::chrono::steady_clock::now();
-    duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+      duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
 #endif
 
       return std::string(filename);
@@ -146,10 +144,10 @@ namespace sortnet {
       f.close();
 #if (RECORD_IO_TIME == 1)
       const auto stop = std::chrono::steady_clock::now();
-    duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+      duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
 #endif
 
       return counter;
     }
   };
-}
+}  // namespace sortnet

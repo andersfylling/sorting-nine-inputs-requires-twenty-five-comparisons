@@ -10,4 +10,4 @@ namespace sortnet {
     binary_read(f, from);
     binary_read(f, to);
   }
-}
+}  // namespace sortnet

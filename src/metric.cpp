@@ -117,4 +117,4 @@ namespace sortnet {
     auto table{ss.str()};
     return table;
   }
-}
+}  // namespace sortnet
