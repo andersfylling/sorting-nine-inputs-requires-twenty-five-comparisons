@@ -86,7 +86,7 @@ namespace sortnet {
     return size;
   }
 
-  double FloatPrecision(double v, double p) { return (floor((v * pow(10, p) + 0.5)) / pow(10, p)); }
+  double FloatPrecision(double v, double p);
 
   // string representation of a set with ordered partitions
   template <uint8_t N, concepts::Set set_t> std::string to_string(set_t& set) {
@@ -110,11 +110,7 @@ namespace sortnet {
   }
 
   // same as in papers => (from, to); (from, to); etc.
-  std::string to_string(const Comparator c, const uint8_t N) {
-    const auto base{N - 1};
-    return "(" + ::std::to_string(int(base - c.from)) + "," + ::std::to_string(int(base - c.to))
-           + ");";
-  }
+  std::string to_string(Comparator c, uint8_t N);
 
   template <concepts::ComparatorNetwork net_t>
   std::string to_string_knuth_diagram(const net_t& net, const uint8_t N, const sequence_t s = 0) {

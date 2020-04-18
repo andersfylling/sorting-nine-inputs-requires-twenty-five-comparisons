@@ -7,8 +7,8 @@
 #include <string>
 #include <string_view>
 
-#include "json.h"
-#include "util.h"
+#include <sortnet/json.h>
+#include <sortnet/util.h>
 
 namespace sortnet {
   class MetricLayer {
@@ -152,5 +152,4 @@ namespace sortnet {
     }
   };
 
-  [[maybe_unused]] static void to_json(::nlohmann::json &j, const MetricLayer &m) { m.to_json(j); }
 }  // namespace sortnet

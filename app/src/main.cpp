@@ -1,7 +1,7 @@
 #include <cxxopts.hpp>
 #include <iostream>
 
-#include "GenerateAndPrune.cpp"  // TODO: cleanup
+#include "GenerateAndPrune.h"
 
 int main(int argc, char** argv) {
   cxxopts::Options options(argv[0],
