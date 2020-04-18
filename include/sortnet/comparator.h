@@ -3,9 +3,9 @@
 #include <array>
 #include <string>
 
-#include "sequence.h"
-
-#include "z_environment.h"
+#include <sortnet/sequence.h>
+#include <sortnet/io.h>
+#include <sortnet/z_environment.h>
 
 namespace sortnet {
   class Comparator {
@@ -29,11 +29,9 @@ namespace sortnet {
       return (seqMask & s) == pattern ? sequence_t(s | seqMask) ^ pattern : s;
     }
 
-    // same as in papers => (from, to); (from, to); etc.
-    template <uint8_t N> std::string to_string() const;
-
-    void write(std::ofstream &f) const;
-    void read(std::ifstream &f);
+    // serialize
+    void write(std::ostream &stream) const;
+    void read(std::istream &stream);
   };
 
   namespace comparator {

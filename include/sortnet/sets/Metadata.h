@@ -4,16 +4,16 @@
 #include <bit>
 
 #include "sortnet/sequence.h"
+#include "sortnet/io.h"
 #include <sortnet/z_environment.h>
 
-namespace sortnet {
-  namespace set {
+namespace sortnet::set {
   template <uint8_t N> class Metadata {
   public:
     static const uint8_t size{N - 1};
 
-    uint64_t netID;
-    bool marked;
+    uint64_t netID{0};
+    bool marked{false};
 
     std::array<sequence_t, size> ones;
     decltype(ones) zeros;
@@ -56,10 +56,26 @@ namespace sortnet {
       }
     }
 
-    // file manipulation
-    void write(std::ostream &f) const;
-    void read(std::istream &f);
+    // serialize
+    void write(std::ostream &f) const {
+      binary_write(f, netID);
+      binary_write(f, ones);
+      binary_write(f, onesCount);
+      binary_write(f, zeros);
+      binary_write(f, zerosCount);
+      binary_write(f, sizes);
+    }
+
+    void read(std::istream &f) {
+      marked = false;
+
+      binary_read(f, netID);
+      binary_read(f, ones);
+      binary_read(f, onesCount);
+      binary_read(f, zeros);
+      binary_read(f, zerosCount);
+      binary_read(f, sizes);
+    }
   };
 
-  }
 }

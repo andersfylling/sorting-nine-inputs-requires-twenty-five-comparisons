@@ -3,6 +3,10 @@
 #include <array>
 #include <fstream>
 #include <limits>
+#include <string>
+#include <bit>
+#include <iostream>
+#include <sstream>
 
 #include "sequence.h"
 #include "sortnet/concepts.h"
@@ -86,5 +90,105 @@ double FloatPrecision(double v, double p);
 
   // string representation of a set with ordered partitions
   template <uint8_t N, concepts::Set set_t>
-  std::string to_string(set_t& set);
+  std::string to_string(set_t& set) {
+    std::stringstream ss{};
+    ss << "(";
+    for (auto k{0}; k < N-1; ++k) {
+      ss << "{";
+      for (const sequence_t s : set) {
+        if (std::popcount(s)-1 != k) {
+          continue;
+        }
+        ss << sequence::binary::to_string<N>(s) << ",";
+      }
+      ss.seekp(-1, std::ios_base::end);
+      ss << "},";
+    }
+    ss.seekp(-1, std::ios_base::end);
+    ss << ")";
+
+    return std::string(ss.str());
+  }
+
+  // same as in papers => (from, to); (from, to); etc.
+  std::string to_string(const Comparator c, const uint8_t N) {
+    const auto base{N - 1};
+    return "(" + std::to_string(int(base - c.from)) + "," + std::to_string(int(base - c.to)) + ");";
+  }
+
+  template <concepts::ComparatorNetwork net_t>
+  std::string to_string_knuth_diagram(const net_t& net, const uint8_t N, const sequence_t s = 0) {
+    sequence_t sOutput{};
+    if (s > 0) {
+      sOutput = net.run(s);
+    }
+    std::string output{};
+
+    for (auto i = 0; i < N; i++) {
+      auto ir = (N - 1) - i;
+      // vertex / node
+      output += s == 0 ? " " : std::to_string((s >> ir) & 1);
+      for (auto it{net.cbegin()}; it != net.cend(); ++it) {
+        const Comparator& c{*it};
+        output += "--";
+        if (c.from == i || c.to == i) {  // TODO: might need to be inverted!
+          output += "+";
+        } else {
+          output += "-";
+        }
+      }
+      output += "--";
+      output += s == 0 ? " " : std::to_string((sOutput >> ir) & 1);
+      output += "\n";
+
+      if (i + 1 == N) {
+        break;
+      }
+
+      // spaces & edge
+      output += " ";
+      for (auto it{net.cbegin()}; it != net.cend(); ++it) {
+        const Comparator& c{*it};
+        output += "  ";
+        if (i < c.to && (i == c.from || i > c.from)) {  // TODO: might need to be inverted!
+          output += "|";
+        } else {
+          output += " ";
+        }
+      }
+      output += "\n";
+    }
+
+    return output;
+  }
+
+  template <concepts::ComparatorNetwork net_t>
+  std::string to_string(const net_t& net, uint8_t N, sequence_t s = 0) {
+    sequence_t sOutput{};
+    if (s > 0) {
+      sOutput = net.run(s);
+    }
+    std::string output{};
+
+    // by default networks as displayed as a graphically using +, | and -.
+    // the compact version simply list the comparators as ordered sets
+    // with node numbers in a left to right, top-down traversal.
+    // eg: "(1, 2); (3, 4); (1, 4);"
+    std::size_t i{0};
+    for (auto it{net.cbegin()}; it != net.cend(); ++it) {
+      const Comparator& c{*it};
+      if (i == net.size()) {
+        break;
+      }
+      output += to_string(c, N) + " ";
+      ++i;
+    }
+
+    if (sOutput > 0) {
+      // TODO: fixed size / zeros padding
+      output += "\n" + std::to_string(s) + " => " + std::to_string(sOutput);
+    }
+
+    return output + "\n";
+  }
 }

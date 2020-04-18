@@ -30,6 +30,12 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+  NAME libpopcnt
+  GITHUB_REPOSITORY kimwalisch/libpopcnt
+  VERSION 2.3
+)
+
+CPMAddPackage(
   NAME Sortnet
   SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..
 )
@@ -46,6 +52,15 @@ set_target_properties(SortnetApp PROPERTIES
   COMPILE_FLAGS "-Wall -pedantic -Wextra -D_GLIBCXX_ASSERTIONS -Wno-sign-compare -Wno-narrowing -fconcepts"
   OUTPUT_NAME "Sortnet"
 )
+
+# enable compiler warnings
+if (NOT TEST_INSTALLED_VERSION)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(Sortnet PUBLIC -Wall -pedantic -Wextra -Werror -fconcepts)
+    elseif(MSVC)
+        target_compile_options(Sortnet PUBLIC /W4 /WX)
+    endif()
+endif()
 
 set(Boost_USE_STATIC_LIBS ON)
 

@@ -92,8 +92,30 @@ namespace sortnet {
       [[nodiscard]] const_iterator cend() const noexcept { return seqs.cend(); }
 
       // file manipulation
-      void write(std::ofstream &f) const;
-      void read(std::ifstream &f);
+      void write(std::ostream &f) const {
+        metadata.write(f);
+
+        std::size_t _size{size()};
+        binary_write(f, _size);
+
+        for (const auto s : seqs) {
+          binary_write(f, s);
+        }
+      }
+
+      void read(std::istream &f) {
+        reset();
+        metadata.read(f);
+
+        std::size_t _size{0};
+        binary_read(f, _size);
+
+        for (std::size_t i{0}; i < _size; ++i) {
+          sequence_t s{0};
+          binary_read(f, s);
+          seqs.push_back(s);
+        }
+      }
     };
   }
 }

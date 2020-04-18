@@ -5,6 +5,10 @@
 #include <map>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <iomanip>
+#include <fstream>
+
+#include "sortnet/io.h"
 
 #include "sortnet/json.h"
 #include "sortnet/concepts.h"
@@ -84,17 +88,68 @@ namespace sortnet {
     }
     std::string folder() { return dir; }
 
-    template <typename _II, typename _II2>
-    std::string Save(const std::string &filename, _II begin, _II2 end);
-    template <typename _II, typename _II2>
-    std::string Save(uint8_t layer, _II begin, const _II2 end, const std::string &prefix = "") {
+    template <typename II, typename II2>
+    std::string Save(const std::string &filename, II begin, II2 end) {
+#if (RECORD_IO_TIME == 1)
+      const auto start = std::chrono::steady_clock::now();
+#endif
+      // TODO: add filter argument, using a boolean lambda
+      std::ofstream f{filename, std::ios::binary | std::ios::trunc};
+      f.unsetf(std::ios_base::skipws);
+
+      // number of networks/sets
+      const uint32_t distance{static_cast<uint32_t>(std::distance(begin, end))};
+      binary_write(f, distance);
+
+      // the actual content
+      for (; begin != end; ++begin) {
+        begin->write(f);
+      }
+      f.close();
+#if (RECORD_IO_TIME == 1)
+      const auto stop = std::chrono::steady_clock::now();
+    duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+#endif
+
+      return std::string(filename);
+    }
+
+    template <typename II, typename II2>
+    std::string Save(uint8_t layer, II begin, const II2 end, const std::string &prefix = "") {
       std::string filename{dir + prefix + createFilename(*begin, layer)};
       return Save(filename, begin, end);
     }
 
-    void Save(const std::string &filename, const ::nlohmann::json &content) const;
+    void Save(const std::string &filename, const ::nlohmann::json &content) const {
+      std::ofstream f{dir + filename, std::ios::out | std::ios::trunc};
+      f << std::setw(2) << content << std::endl;
+      f.close();
+    }
 
     template <typename iterator>
-    uint32_t Load(const std::string &filename, uint8_t layer, iterator begin, iterator end);
+    uint32_t Load(const std::string &filename, uint8_t layer, iterator it, iterator end) {
+#if (RECORD_IO_TIME == 1)
+      const auto start = std::chrono::steady_clock::now();
+#endif
+      std::ifstream f{filename, std::ios::in | std::ios::binary};
+      f.unsetf(std::ios_base::skipws);
+
+      uint32_t limit{};
+      binary_read(f, limit);
+
+      uint32_t counter{0};
+      for (; it != end && counter < limit; ++it) {
+        it->read(f, layer);
+        ++counter;
+      }
+
+      f.close();
+#if (RECORD_IO_TIME == 1)
+      const auto stop = std::chrono::steady_clock::now();
+    duration += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+#endif
+
+      return counter;
+    }
   };
 }

@@ -1,28 +1,13 @@
-#include <sortnet/greeter.h>
-
 #include <cxxopts.hpp>
 #include <iostream>
-#include <string>
-#include <unordered_map>
-
-const std::unordered_map<std::string, greeter::LanguageCode> languages{
-    {"en", greeter::LanguageCode::EN},
-    {"de", greeter::LanguageCode::DE},
-    {"es", greeter::LanguageCode::ES},
-    {"fr", greeter::LanguageCode::FR},
-};
 
 int main(int argc, char** argv) {
-  cxxopts::Options options(argv[0], "A program to welcome the world!");
-
-  std::string language;
-  std::string name;
+  cxxopts::Options options(argv[0], "Generate and prune approach for finding the smallest sized sorting network for a sequence of N elements");
 
   // clang-format off
   options.add_options()
     ("h,help", "Show help")
-    ("n,name", "Name to greet", cxxopts::value(name)->default_value("World"))
-    ("l,lang", "Language code to use", cxxopts::value(language)->default_value("en"))
+    ("info", "Project information")
   ;
   // clang-format on
 
@@ -31,16 +16,13 @@ int main(int argc, char** argv) {
   if (result["help"].as<bool>()) {
     std::cout << options.help() << std::endl;
     return 0;
+  } else if (result["info"].as<bool>()) {
+    std::cout << "Third part c++ implementation of the paper \"Sorting nine inputs requires twenty-five comparisons\"." << std::endl << std::endl;
+    std::cout << "https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons" << std::endl;
+    std::cout << "MIT License - Copyright (c) 2020 Anders Øen Fylling" << std::endl;
+    return 0;
   }
 
-  auto langIt = languages.find(language);
-  if (langIt == languages.end()) {
-    std::cout << "unknown language code: " << language << std::endl;
-    return 1;
-  }
-
-  greeter::Greeter greeter(name);
-  std::cout << greeter.greet(langIt->second) << std::endl;
-
+  std::cout << "running" << std::endl;
   return 0;
 }

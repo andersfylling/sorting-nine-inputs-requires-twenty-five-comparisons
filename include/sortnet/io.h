@@ -1,6 +1,7 @@
 #pragma once
 
-#include <fstream>
+#include <ostream>
+#include <istream>
 #include <string>
 
 namespace sortnet {

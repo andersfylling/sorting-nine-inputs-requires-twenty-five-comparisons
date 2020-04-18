@@ -86,8 +86,10 @@ namespace sortnet {
       return sizes;
     }};
 
-    template <uint8_t N> std::string to_string(sequence_t s);
-    template <uint8_t N> std::string to_set_string(sequence_t s);
+    template <uint8_t N> std::string to_string(sequence_t s) {
+      auto bs = std::bitset<N>(s);
+      return bs.to_string();
+    }
   }  // namespace sequence::binary
 
   // default

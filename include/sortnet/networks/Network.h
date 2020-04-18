@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sortnet/comparator.h"
+#include "sortnet/io.h"
 
 #include "../z_environment.h"
 
@@ -69,10 +70,42 @@ namespace sortnet {
         return s;
       };
 
-      void write(std::ofstream &f) const;
-      void read(std::ifstream &f);
-      [[nodiscard]] std::string to_string(sequence_t s = 0) const;
-      [[nodiscard]] std::string knuthDiagram(sequence_t s = 0) const;
+      // iterators for the comparators
+      using const_iterator = typename std::vector<Comparator>::const_iterator;
+      using iterator = typename std::vector<Comparator>::iterator;
+      iterator begin() { return comparators.begin(); }
+      [[nodiscard]] const_iterator cbegin() const noexcept { return comparators.cbegin(); }
+      iterator end() { return comparators.end(); }
+      [[nodiscard]] const_iterator cend() const noexcept { return comparators.cend(); }
+
+      // serialize network
+      void write(std::ostream &stream) const {
+        binary_write(stream, id);
+
+        std::size_t _size{comparators.size()};
+        binary_write(stream, _size);
+
+        for (std::size_t i = 0; i < _size; i++) {
+          const Comparator c{comparators.at(i)};
+          binary_write(stream, c);
+        }
+      }
+
+      void read(std::istream &stream) {
+        clear();
+
+        binary_read(stream, id);
+
+        std::size_t _size{0};
+        binary_read(stream, _size);
+
+        for (std::size_t i{0}; i < _size; ++i) {
+          Comparator c{0, 0};
+          c.read(stream);
+
+          push_back(c);
+        }
+      }
     };
   }
   }

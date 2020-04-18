@@ -56,39 +56,6 @@ namespace sortnet {
     }
   }
 
-  template <uint8_t N, uint8_t K> std::string MetricsLayered<N, K>::String() const {
-    std::stringstream ss{};
-
-    ss << std::setw(10) << int(N);
-    ss << " |";
-    for (uint8_t i = StringViewMinSize; i < metrics.size(); i++) {
-      const auto &m{metrics[i]};
-      ss << std::setw(10) << (m.Generated - m.Pruned);
-      if (i % 10 == 0) {
-        ss << "'";
-      }
-    }
-
-    return ss.str();
-  }
-
-  template <uint8_t N, uint8_t K> std::string MetricsLayered<N, K>::HeaderString(uint8_t maxSize) {
-    std::stringstream ss{};
-
-    ss << std::setw(10) << "N\\k";
-    ss << " |";
-    for (auto i = StringViewMinSize; i <= maxSize; i++) {
-      ss << std::setw(10) << int(i);
-      if (i % 10 == 0) {
-        ss << "'";
-      }
-    }
-    ss << std::endl;
-
-    auto str{ss.str()};
-    return str + std::string(str.size(), '-');
-  }
-
   std::string comparisonTable(const MetricLayer &n7k9, const MetricLayer &n7k10) {
     auto i{0};
     const std::array<uint8_t, 10> width{
@@ -149,24 +116,5 @@ namespace sortnet {
 
     auto table{ss.str()};
     return table;
-  }
-
-  template <uint8_t N, uint8_t K>
-  ::nlohmann::json MetricsLayered<N, K>::to_json(const uint8_t cores,
-                                                 const std::size_t fileLimit) const {
-    ::nlohmann::json j;
-    j["n"] = N;
-    j["k"] = K;
-    j["duration"] = Seconds();
-    j["duration_type"] = "seconds";
-    j["cores"] = cores;
-    j["layers"] = metrics;
-    j["file_limit"] = fileLimit;
-
-    std::time_t result = std::time(nullptr);
-    j["date"] = std::asctime(std::localtime(&result));
-    j["epoch"] = result;
-
-    return j;
   }
 }

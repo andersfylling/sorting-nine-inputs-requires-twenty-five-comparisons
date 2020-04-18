@@ -5,7 +5,6 @@
 #include <sortnet/permutation.h>
 #include <sortnet/sequence.h>
 #include <sortnet/concepts.h>
-#include <sortnet/util.h>
 
 #include <sortnet/z_environment.h>
 

@@ -30,6 +30,12 @@ CPMAddPackage(
   VERSION 1.0
 )
 
+#CPMAddPackage(
+#        NAME libpopcnt
+#        GITHUB_REPOSITORY andersfylling/libpopcnt
+#        VERSION 2.3.2
+#)
+
 CPMAddPackage(
         NAME nlohmann_json
         VERSION 3.7.3

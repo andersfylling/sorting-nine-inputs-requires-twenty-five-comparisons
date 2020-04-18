@@ -99,11 +99,55 @@ namespace sortnet {
       return duration;
     }
 
-    std::string HeaderString(uint8_t maxSize);
+    std::string HeaderString(uint8_t maxSize) {
+      std::stringstream ss{};
 
-    [[nodiscard]] std::string String() const;
+      ss << std::setw(10) << "N\\k";
+      ss << " |";
+      for (auto i = StringViewMinSize; i <= maxSize; i++) {
+        ss << std::setw(10) << int(i);
+        if (i % 10 == 0) {
+          ss << "'";
+        }
+      }
+      ss << std::endl;
 
-    [[nodiscard]] ::nlohmann::json to_json(uint8_t cores, std::size_t fileLimit) const;
+      auto str{ss.str()};
+      return str + std::string(str.size(), '-');
+    }
+
+    [[nodiscard]] std::string String() const {
+      std::stringstream ss{};
+
+      ss << std::setw(10) << int(N);
+      ss << " |";
+      for (uint8_t i = StringViewMinSize; i < metrics.size(); i++) {
+        const auto &m{metrics[i]};
+        ss << std::setw(10) << (m.Generated - m.Pruned);
+        if (i % 10 == 0) {
+          ss << "'";
+        }
+      }
+
+      return ss.str();
+    }
+
+    [[nodiscard]] ::nlohmann::json to_json(uint8_t cores, std::size_t fileLimit) const {
+      ::nlohmann::json j;
+      j["n"] = N;
+      j["k"] = K;
+      j["duration"] = Seconds();
+      j["duration_type"] = "seconds";
+      j["cores"] = cores;
+      j["layers"] = metrics;
+      j["file_limit"] = fileLimit;
+
+      std::time_t result = std::time(nullptr);
+      j["date"] = std::asctime(std::localtime(&result));
+      j["epoch"] = result;
+
+      return j;
+    }
   };
 
   [[maybe_unused]] static void to_json(::nlohmann::json &j, const MetricLayer &m) { m.to_json(j); }

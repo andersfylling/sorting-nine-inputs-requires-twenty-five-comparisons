@@ -3,13 +3,11 @@
 
 #define UNIT_TEST 1
 
-#include <sortnet/concepts.h>
 #include <sortnet/networks/Network.h>
 #include <sortnet/sequence.h>
 #include <sortnet/sets/ListNaive.h>
 
 #include "sortnet/permutation.h"
-#include "sortnet/util.h"
 #include "utilTest.h"
 
 template <uint8_t N>

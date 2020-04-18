@@ -9,9 +9,8 @@
 #include <sortnet/BufferPool.h>
 #include <sortnet/json.h>
 #include <sortnet/metric.h>
-#include <sortnet/networks/concept.h>
+#include <sortnet/concepts.h>
 #include <sortnet/permutation.h>
-#include <sortnet/sets/concept.h>
 #include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
 
 #include <sortnet/z_environment.h>
@@ -21,7 +20,7 @@ struct NetAndSetFilename {
   const std::string set;
 };
 
-template <std::size_t limit, SeqSet Set, ComparatorNetwork Net>
+template <std::size_t limit, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net>
 class NetAndSet {
  public:
   std::size_t      size{0};
@@ -52,18 +51,18 @@ class NetAndSet {
   }
 };
 
-template <uint8_t N, uint8_t K, uint8_t NrOfCores, SeqSet Set, ComparatorNetwork Net,
+template <uint8_t N, uint8_t K, uint8_t NrOfCores, ::sortnet::concepts::Set Set, ::sortnet::concepts::ComparatorNetwork Net,
           typename Storage>
 class GenerateAndPrune {
  private:
-  static const auto           FileLimit{NetworksPerFileLimit * 2};  // ugly
+  static const auto           FileLimit{::sortnet::segment_capacity * 2};  // ugly
   std::vector<NetAndSetFilename> filenames{};
   Storage storage{};
 
-  BufferPool<Set, Net, NrOfCores, NetworksPerFileLimit> buffers{};
+  ::sortnet::BufferPool<Set, Net, NrOfCores, ::sortnet::segment_capacity> buffers{};
 
-  MetricsLayered<N, K> metrics{};
-  MetricLayer *        metric = &metrics.at(0);
+  ::sortnet::MetricsLayered<N, K> metrics{};
+  ::sortnet::MetricLayer *        metric = &metrics.at(0);
 
   ::dbr::cc::ThreadPool pool;
 
@@ -83,7 +82,7 @@ class GenerateAndPrune {
     set.metadata.netID = net.id;
 
     // populate the output set with all the sequences from <0, N^2]
-    for (sequence_t s{1}; s <= ::sequence::binary::size<N>(); ++s) {
+    for (::sortnet::sequence_t s{1}; s <= ::sortnet::sequence::binary::size<N>(); ++s) {
       const auto k{std::popcount(s) - 1};
       set.insert(k, s);
     }
@@ -131,11 +130,11 @@ class GenerateAndPrune {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST4Calls++;
 #endif
-    ::permutation::constraints_t<N> constraints{};
-    ::permutation::clear<N>(constraints);
-    ::permutation::constraints<N>(constraints, setA, setB);
+    ::sortnet::permutation::constraints_t<N> constraints{};
+    ::sortnet::permutation::clear<N>(constraints);
+    ::sortnet::permutation::constraints<N>(constraints, setA, setB);
 
-    if (!::permutation::valid_fast<N>(constraints)) {
+    if (!::sortnet::permutation::valid_fast<N>(constraints)) {
       return false;
     }
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -143,13 +142,13 @@ class GenerateAndPrune {
     metric->PermutationGeneratorCalls++;
 #endif
 
-    return ::permutation::generate<N>(
+    return ::sortnet::permutation::generate<N>(
         constraints,
-        [&](const ::permutation::permutation_t<N> &p) {
+        [&](const ::sortnet::permutation::permutation_t<N> &p) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->Permutations++;
 #endif
-          return ::permutation::subsumes<N>(p, setA, setB);
+          return ::sortnet::permutation::subsumes<N>(p, setA, setB);
         });
   }
 
@@ -157,21 +156,21 @@ class GenerateAndPrune {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST1Calls++;
 #endif
-    if (!::permutation::ST1(setA, setB)) {
+    if (!::sortnet::permutation::ST1(setA, setB)) {
       return false;
     }
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST1++;
     metric->ST2Calls++;
 #endif
-    if (!::permutation::ST2(setA, setB)) {
+    if (!::sortnet::permutation::ST2(setA, setB)) {
       return false;
     }
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST2++;
     metric->ST3Calls++;
 #endif
-    if (!::permutation::ST3(setA, setB)) {
+    if (!::sortnet::permutation::ST3(setA, setB)) {
       return false;
     }
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -240,7 +239,7 @@ class GenerateAndPrune {
         continue;
       }
 
-      for (II it2{begin2}; it2 != end; ++it2) {
+      for (II it2{begin2}; it2 != end2; ++it2) {
         Set setB{*it2};
         if (setB.metadata.marked) {
           continue;
@@ -255,7 +254,7 @@ class GenerateAndPrune {
 
  public:
   GenerateAndPrune() : pool(NrOfCores) {}
-  MetricsLayered<N, K> run();
+  ::sortnet::MetricsLayered<N, K> run();
 
   uint64_t generate(uint8_t layer);
 
