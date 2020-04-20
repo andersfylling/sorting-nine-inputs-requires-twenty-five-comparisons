@@ -105,7 +105,7 @@ private:
     return counter;
   }
 
-  constexpr bool subsumesByPermutation(const Set &setA, const Set &setB) {
+  constexpr bool subsumesByPermutation(const Set &setA, const Set &setB) const {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST4Calls++;
 #endif
@@ -130,7 +130,7 @@ private:
         });
   }
 
-  constexpr bool permutationConditions(const Set &setA, const Set &setB) {
+  constexpr bool permutationConditions(const Set &setA, const Set &setB) const {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST1Calls++;
 #endif
@@ -184,6 +184,7 @@ private:
       metric->HasNoPermutation++;
 #endif
     }
+    return false;
   }
 
   // mark redundant sets within a file
@@ -208,9 +209,9 @@ private:
   }
 
   // mark redundant sets across two files
-  template <typename II> constexpr void markRedundantNetworks(const II begin1, const II end1,
-                                                              const II begin2,
-                                                              const II end2) const {
+  template <typename II, typename IIMut> constexpr void markRedundantNetworks(const II begin1, const II end1,
+                                                              const IIMut begin2,
+                                                              const IIMut end2) const {
     for (II it1{begin1}; it1 != end1; ++it1) {
       Set setA{*it1};
       if (setA.metadata.marked) {
@@ -235,8 +236,11 @@ public:
   ::sortnet::MetricsLayered<N, K> run() {
     metric = &metrics.at(0);
 
-    auto microsecondsToSeconds = [](const double_t mcs) { return mcs / 1000000.0; };
+#if (RECORD_IO_TIME == 1)
     auto nanosecondsToSeconds = [](const double_t ns) { return ns / 1000000000.0; };
+#endif
+
+    auto microsecondsToSeconds = [](const double_t mcs) { return mcs / 1000000.0; };
     auto duration = [&](auto start, auto end) {
       const auto d = end - start;
       const auto mcs = std::chrono::duration_cast<std::chrono::microseconds>(d).count();
@@ -337,7 +341,7 @@ public:
   }
 
   template <typename Functor>
-  uint64_t read(const NetAndSetFilename &file, uint8_t layer, Functor &&_f) {
+  uint64_t read(const NetAndSetFilename &file, uint8_t layer, Functor _f) {
     constexpr uint32_t FileSize{::sortnet::segment_capacity};
 
     std::vector<Set> sets(FileSize);
@@ -361,19 +365,19 @@ public:
     sets.resize(nrOfSets);
 
     for (const auto& set : sets) {
-      const auto netID{set->metadata.netID};
-      const auto& net = find(netID, nets.begin(), nets.begin() + nrOfNets);
-      _f(set, net);
+      const auto netID{set.metadata.netID};
+      const Net& net = find(netID, nets.begin(), nets.begin() + nrOfNets);
+      _f(net, set);
     }
 
     return nrOfSets;  // nrOfNets contains pruned entities
   }
+
   uint64_t generate(uint8_t layer) {
     const auto existingFiles = std::move(filenames);
     filenames.clear();  // TODO: redundant?
 
-    auto save = [&](const std::size_t size, auto itNets, const auto endNets, auto itSets,
-                    const auto endSets) -> void {
+    auto save = [&](auto itNets, const auto endNets, auto itSets, const auto endSets) -> void {
       const auto netFile = storage.Save(layer, itNets, endNets);
       const auto setFile = storage.Save(layer, itSets, endSets);
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -410,7 +414,8 @@ public:
 
           // apply new comparator and see if it causes a new change
           setBuffer.reset();
-          for (auto s : set) {
+          for (auto it{set.cbegin()}; it != set.cend(); ++it) {
+            ::sortnet::sequence_t s{*it};
             const auto k{std::popcount(s) - 1};
             setBuffer.insert(k, c.apply(s));
           }
@@ -425,7 +430,7 @@ public:
           nets.at(counter).id = idCounter;
           nets.at(counter).push_back(c);
           sets.at(counter) = set;
-          sets.at(counter).metadata.id = idCounter;
+          sets.at(counter).metadata.netID = idCounter;
           sets.at(counter).computeMeta();
           ++counter;
           ++idCounter;
@@ -589,7 +594,7 @@ public:
     return pruned;
   }
 
-  void printLayerSummary(uint8_t layer, double_t fileIODurationGen, double_t fileIODuration) {
+  void printLayerSummary([[maybe_unused]] uint8_t layer, [[maybe_unused]] double_t fileIODurationGen, [[maybe_unused]] double_t fileIODuration) {
     auto dec = [](const double_t v) -> std::string {
       const auto precision = 2;
       return std::to_string(v).substr(0, std::to_string(v).find(".") + precision + 1);

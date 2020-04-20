@@ -50,11 +50,11 @@ namespace sortnet {
       return this->fileName(prefix, size, nr);
     }
 
-    inline std::string createFilename(const Net &network, uint8_t layer) {
+    inline std::string createFilename([[maybe_unused]] const Net &network, uint8_t layer) {
       return this->createFilename(PrefixNetworks, layer);
     }
 
-    inline std::string createFilename(const Set &set, uint8_t layer) {
+    inline std::string createFilename([[maybe_unused]] const Set &set, uint8_t layer) {
       return this->createFilename(PrefixSets, layer);
     }
 
@@ -125,7 +125,7 @@ namespace sortnet {
     }
 
     template <typename iterator>
-    uint32_t Load(const std::string &filename, uint8_t layer, iterator it, iterator end) {
+    uint32_t Load(const std::string &filename, [[maybe_unused]] uint8_t layer, iterator it, iterator end) {
 #if (RECORD_IO_TIME == 1)
       const auto start = std::chrono::steady_clock::now();
 #endif
@@ -137,7 +137,7 @@ namespace sortnet {
 
       uint32_t counter{0};
       for (; it != end && counter < limit; ++it) {
-        it->read(f, layer);
+        it->read(f);
         ++counter;
       }
 

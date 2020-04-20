@@ -1,7 +1,33 @@
+#define LEMMA_7 1
+#define RECORD_INTERNAL_METRICS 1
+#define PRINT_LAYER_SUMMARY 1
+#define PRINT_PROGRESS 1
+#define RECORD_ANALYSIS 1
+#define SAVE_METRICS 1
+#define PREFER_SAFETY 0
+#define RECORD_IO_TIME 0
+
 #include <cxxopts.hpp>
 #include <iostream>
 
 #include "GenerateAndPrune.h"
+
+#include <sortnet/sets/ListNaive.h>
+#include <sortnet/networks/Network.h>
+#include <sortnet/persistentStorage.h>
+
+constexpr uint8_t NrOfCores{7};
+constexpr uint8_t N{7};
+
+template <uint8_t N, uint8_t K = ::sortnet::networkSizeUpperBound<N>()>
+constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
+  using Set     = ::sortnet::set::ListNaive<N, K>;
+  using Net     = ::sortnet::network::Network<N, K>;
+  using Storage = ::sortnet::PersistentStorage<Net, Set, N, K>;
+
+  auto g = GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>{};
+  return g.run();
+}
 
 int main(int argc, char** argv) {
   cxxopts::Options options(argv[0],
@@ -32,6 +58,12 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  std::cout << "running" << std::endl;
+  std::ios::sync_with_stdio(false);
+  const auto m = metricsFor<N>();
+
+  std::cout << m.Seconds() << std::endl;
+
+
+  usleep(3000000); // 3s
   return 0;
 }

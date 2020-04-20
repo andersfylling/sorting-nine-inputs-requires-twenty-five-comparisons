@@ -68,6 +68,8 @@ namespace sortnet {
     void to_json(::nlohmann::json &j) const;
   };
 
+  void to_json(nlohmann::json& j, const MetricLayer& m);
+
   std::string comparisonTable(const MetricLayer &n7k9, const MetricLayer &n7k10);
 
   template <uint8_t N, uint8_t K> class MetricsLayered {

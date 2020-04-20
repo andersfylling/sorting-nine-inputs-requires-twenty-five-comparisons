@@ -48,7 +48,7 @@ namespace sortnet {
       }
 
       constexpr void pop_back() { comparators.pop_back(); }
-      constexpr Comparator back() {
+      constexpr Comparator back() const {
         if (comparators.empty()) {
           return Comparator(0, 0);
         }

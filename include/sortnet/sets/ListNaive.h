@@ -26,6 +26,7 @@ namespace sortnet {
       constexpr ListNaive &operator=(const ListNaive &rhs) {
         metadata = rhs.metadata;
         std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), seqs.begin());
+        return *this;
       };
       constexpr bool operator==(const ListNaive &rhs) {
         if (seqs.size() != rhs.seqs.size()) {

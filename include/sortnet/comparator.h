@@ -14,6 +14,7 @@ namespace sortnet {
     uint8_t from;
     uint8_t to;
 
+    constexpr Comparator() : from(0), to(0) {};
     constexpr Comparator(const uint8_t from, const uint8_t to) : from(from), to(to){};
     constexpr Comparator(const Comparator &rhs) = default;
     constexpr Comparator &operator=(const Comparator &rhs) = default;
@@ -56,12 +57,12 @@ namespace sortnet {
     }
 
     template <uint8_t N> constexpr auto all{[]() {
-      std::array<Comparator, size<N>()> comparators{};
+      std::array<::sortnet::Comparator, size<N>()> comparators{};
 
       std::size_t i{0};
       for (int from{N - 1}; from != 0; --from) {
         for (int to{from - 1}; to >= 0; --to) {
-          comparators.at(i) = create<N>(static_cast<uint8_t>(from), static_cast<uint8_t>(to));
+          comparators.at(i) = ::sortnet::Comparator(static_cast<uint8_t>(from), static_cast<uint8_t>(to));
           ++i;
         }
       }

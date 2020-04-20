@@ -49,17 +49,23 @@ if (nlohmann_json_ADDED)
     target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 endif()
 
-CPMAddPackage(
-        NAME boost
-        VERSION 1.70.0
-        URL https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
-        URL_HASH SHA256=882b48708d211a5f48e60b0124cf5863c1534cd544ecd0664bb534a4b5d506e9
-)
+#CPMAddPackage(
+#        NAME boost
+#        VERSION 1.70.0
+#        URL https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
+#        URL_HASH SHA256=882b48708d211a5f48e60b0124cf5863c1534cd544ecd0664bb534a4b5d506e9
+#)
+#
+#if (boost_ADDED)
+#    add_library(boost INTERFACE IMPORTED)
+#    target_include_directories(boost INTERFACE "${boost_SOURCE_DIR}")
+#endif()
 
-if (boost_ADDED)
-    add_library(boost INTERFACE IMPORTED)
-    target_include_directories(boost INTERFACE "${boost_SOURCE_DIR}")
-endif()
+CPMAddPackage(
+        NAME boost-cmake
+        GITHUB_REPOSITORY Orphis/boost-cmake
+        GIT_TAG origin/master
+)
 
 # ---- Add source files ----
 
@@ -84,7 +90,8 @@ set_target_properties(Sortnet PROPERTIES CXX_STANDARD 20)
 target_compile_options(Sortnet PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # Link dependencies (if required)
-target_link_libraries(Sortnet PUBLIC nlohmann_json boost)
+set(Boost_USE_STATIC_LIBS ON)
+target_link_libraries(Sortnet PUBLIC nlohmann_json Boost::boost Boost::system)
 
 target_include_directories(Sortnet
   PUBLIC

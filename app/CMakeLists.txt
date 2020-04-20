@@ -63,6 +63,5 @@ if (NOT TEST_INSTALLED_VERSION)
     endif()
 endif()
 
-set(Boost_USE_STATIC_LIBS ON)
 
 target_link_libraries(SortnetApp Sortnet tabulate progresscpp cxxopts)
