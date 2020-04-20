@@ -18,6 +18,7 @@ endif()
 
 include(cmake/tools.cmake)
 
+
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
@@ -61,18 +62,25 @@ endif()
 #    target_include_directories(boost INTERFACE "${boost_SOURCE_DIR}")
 #endif()
 
-CPMAddPackage(
-        NAME boost-cmake
-        GITHUB_REPOSITORY Orphis/boost-cmake
-        GIT_TAG origin/master
-)
+#CPMAddPackage(
+#        NAME Boost
+#        GITHUB_REPOSITORY Orphis/boost-cmake
+#        GIT_TAG origin/master
+#        FIND_PACKAGE_ARGUMENTS "COMPONENTS system"
+#)
+
+find_package(Threads REQUIRED)
 
 # ---- Add source files ----
 
 # Note: globbing sources is considered bad practice as CMake's generators may not detect new files automatically.
 # Keep that in mind when changing files, or explicitly mention them here.
-FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/**/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h")
-FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/**/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
+        )
+FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.cpp"
+        )
 
 # ---- Create library ----
 
@@ -82,7 +90,7 @@ FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/
 
 set(CMAKE_REQUIRED_FLAGS -fconcepts)
 
-add_library(Sortnet STATIC ${headers} ${sources} src/util.cpp)
+add_library(Sortnet STATIC ${headers} ${sources})
 
 set_target_properties(Sortnet PROPERTIES CXX_STANDARD 20)
 
@@ -90,8 +98,7 @@ set_target_properties(Sortnet PROPERTIES CXX_STANDARD 20)
 target_compile_options(Sortnet PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # Link dependencies (if required)
-set(Boost_USE_STATIC_LIBS ON)
-target_link_libraries(Sortnet PUBLIC nlohmann_json Boost::boost Boost::system)
+target_link_libraries(Sortnet PUBLIC nlohmann_json Threads::Threads)
 
 target_include_directories(Sortnet
   PUBLIC

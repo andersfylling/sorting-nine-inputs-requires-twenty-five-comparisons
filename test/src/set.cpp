@@ -55,7 +55,7 @@ TEST_CASE("Subsuming check") {
   REQUIRE(Ca.size() == K);
 
   SUBCASE("Network Ca is correct") {
-    auto CaStr = ::sortnet::to_string(Ca, N);
+    auto CaStr = ::sortnet::to_string<N>(Ca);
     removeSpaces(CaStr);
     std::string paperStrCa{"(0, 1); (1, 2); (0, 3);"};
     removeSpaces(paperStrCa);
@@ -76,7 +76,7 @@ TEST_CASE("Subsuming check") {
   REQUIRE(Cb.size() == 3);
 
   SUBCASE("Network Cb is correct") {
-    std::string CbStr = ::sortnet::to_string(Cb, N);
+    std::string CbStr = ::sortnet::to_string<N>(Cb);
     removeSpaces(CbStr);
     std::string paperStrCb{"(0, 1); (0, 2); (1, 3);"};
     removeSpaces(paperStrCb);

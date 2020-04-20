@@ -67,11 +67,12 @@ private:
       set.insert(k, s);
     }
     set.computeMeta();  // compute metadata, if needed...
+    metric->Generated = 1;
 
     // store
     const auto layer{0};
-    const auto netFile = storage.Save(layer, _networks.cbegin(), _networks.cend());
-    const auto setFile = storage.Save(layer, _sets.cbegin(), _sets.cend());
+    const auto netFile = storage.Save(layer, _networks.cbegin(), _networks.cbegin() + 1);
+    const auto setFile = storage.Save(layer, _sets.cbegin(), _sets.cbegin() + 1);
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->FileWrite++;
 #endif
@@ -158,45 +159,45 @@ private:
     return true;
   }
 
-  // compare two sets and check if they can be subsumed by a permutation
-  // return true if the first set is marked (allowing fail fast)
-  constexpr bool marked(Set &setA, Set &setB) const {
+// compare two sets and check if they can be subsumed by a permutation
+// return true if the first set is marked (allowing fail fast)
+constexpr bool marked(Set &setA, Set &setB) const {
     if (permutationConditions(setA, setB) && subsumesByPermutation(setA, setB)) {
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->Subsumptions++;
+        metric->Subsumptions++;
 #endif
-      setB.metadata.marked = true;
-      return false;
+        setB.metadata.marked = true;
+        return false;
     } else {
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->HasNoPermutation++;
+        metric->HasNoPermutation++;
 #endif
     }
 
     if (permutationConditions(setB, setA) && subsumesByPermutation(setB, setA)) {
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->Subsumptions++;
+        metric->Subsumptions++;
 #endif
-      setA.metadata.marked = true;
-      return true;
+        setA.metadata.marked = true;
+        return true;
     } else {
 #if (RECORD_INTERNAL_METRICS == 1)
-      metric->HasNoPermutation++;
+        metric->HasNoPermutation++;
 #endif
     }
     return false;
-  }
+}
 
   // mark redundant sets within a file
   template <typename II> constexpr void markRedundantNetworks(II it, const II end) const {
     for (; it != end; ++it) {
-      Set setA{*it};
+      Set& setA{*it};
       if (setA.metadata.marked) {
         continue;
       }
 
       for (auto it2{it + 1}; it2 != end; ++it2) {
-        Set setB{*it2};
+        Set& setB{*it2};
         if (setB.metadata.marked) {
           continue;
         }
@@ -213,20 +214,35 @@ private:
                                                               const IIMut begin2,
                                                               const IIMut end2) const {
     for (II it1{begin1}; it1 != end1; ++it1) {
-      Set setA{*it1};
+      const Set& setA{*it1};
       if (setA.metadata.marked) {
         continue;
       }
 
-      for (II it2{begin2}; it2 != end2; ++it2) {
-        Set setB{*it2};
+      for (IIMut it2{begin2}; it2 != end2; ++it2) {
+        Set& setB{*it2};
         if (setB.metadata.marked) {
           continue;
         }
 
-        if (marked(setA, setB)) {
-          break;
+        if (!permutationConditions(setA, setB)) {
+#if (RECORD_INTERNAL_METRICS == 1)
+          metric->HasNoPermutation++;
+#endif
+          continue;
         }
+
+        if (!subsumesByPermutation(setA, setB)) {
+#if (RECORD_INTERNAL_METRICS == 1)
+          metric->HasNoPermutation++;
+#endif
+          continue;
+        }
+
+#if (RECORD_INTERNAL_METRICS == 1)
+        metric->Subsumptions++;
+#endif
+        setB.metadata.marked = true;
       }
     }
   }
@@ -392,7 +408,7 @@ public:
 
 #if (PRINT_PROGRESS == 1)
     uint64_t filters = metrics.at(layer - 1).filters();
-    Progress bar("generating", "files & clusters", filters);
+    Progress bar("generating", "files", filters);
     bar.display();
 #endif
 
@@ -403,7 +419,7 @@ public:
     uint64_t idCounter{0};
     Set setBuffer{};
     for (const auto& file : existingFiles) {
-      auto nrOfNetworks = this->read(file, layer, [&](const Net& net, const Set& set) {
+      auto nrOfNetworks = this->read(file, layer - 1, [&](const Net& net, const Set& set) {
         for (const ::sortnet::Comparator& c : ::sortnet::comparator::all<N>) {
           if (net.back() == c) {
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -413,7 +429,7 @@ public:
           }
 
           // apply new comparator and see if it causes a new change
-          setBuffer.reset();
+          setBuffer.clear();
           for (auto it{set.cbegin()}; it != set.cend(); ++it) {
             ::sortnet::sequence_t s{*it};
             const auto k{std::popcount(s) - 1};
@@ -449,7 +465,7 @@ public:
 
     // check if there is anything else to write to file
     if (counter > 0) {
-      save(nets.cbegin(), nets.cend(), sets.cbegin(), sets.cend());
+      save(nets.cbegin(), nets.cbegin() + counter, sets.cbegin(), sets.cbegin() + counter);
     }
 #if (PRINT_PROGRESS == 1)
     bar.done();
@@ -468,9 +484,11 @@ public:
 
     auto updateProgress = [&]() -> void {
 #if (PRINT_PROGRESS == 1)
-      const std::lock_guard<std::mutex> lock(m);
+      m.lock();
+      // const std::lock_guard<std::mutex> lock(m);
       ++bar;
       bar.display();
+      m.unlock();
 #endif
     };
 
@@ -487,7 +505,9 @@ public:
 
       markRedundantNetworks(begin, begin + size);
       size = shiftRedundant(begin, begin + size);
+      updateProgress();
       if (size == originalSize) {
+        buffers.put(buffer);
         return 0;
       }
 
@@ -497,7 +517,6 @@ public:
       metric->FileWrite++;
 #endif
 
-      updateProgress();
 
       buffers.put(buffer);
       return originalSize - size;
@@ -521,6 +540,7 @@ public:
 
     return pruned;
   }
+
   uint64_t pruneAcrossFiles(uint8_t layer) {
     auto prune = [&](const std::string& filename, auto begin, auto end) -> uint32_t {
       auto* buffer = buffers.get();

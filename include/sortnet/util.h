@@ -110,7 +110,12 @@ namespace sortnet {
   }
 
   // same as in papers => (from, to); (from, to); etc.
-  std::string to_string(Comparator c, uint8_t N);
+  template <uint8_t N>
+  std::string to_string(Comparator c) {
+    constexpr auto base{N - 1};
+    return "(" + ::std::to_string(int(base - c.from)) + "," + ::std::to_string(int(base - c.to))
+           + ");";
+  }
 
   template <concepts::ComparatorNetwork net_t>
   std::string to_string_knuth_diagram(const net_t& net, const uint8_t N, const sequence_t s = 0) {
@@ -158,8 +163,8 @@ namespace sortnet {
     return output;
   }
 
-  template <concepts::ComparatorNetwork net_t>
-  std::string to_string(const net_t& net, uint8_t N, sequence_t s = 0) {
+  template <uint8_t N, concepts::ComparatorNetwork net_t>
+  std::string to_string(const net_t& net, sequence_t s = 0) {
     sequence_t sOutput{};
     if (s > 0) {
       sOutput = net.run(s);
@@ -176,7 +181,7 @@ namespace sortnet {
       if (i == net.size()) {
         break;
       }
-      output += to_string(c, N) + " ";
+      output += to_string<N>(c) + " ";
       ++i;
     }
 

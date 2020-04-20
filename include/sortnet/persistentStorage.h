@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -60,7 +60,7 @@ namespace sortnet {
 
     [[nodiscard]] std::string createFolder() const {
       const auto NStr = std::to_string(N);
-      return "./network" + NStr + "/";
+      return "network" + NStr + "/";
     }
 
   public:
@@ -70,9 +70,9 @@ namespace sortnet {
 
     explicit PersistentStorage(const bool clearDir) {
       if (clearDir) {
-        const auto path = boost::filesystem::path(dir);
-        boost::filesystem::remove_all(path);
-        boost::filesystem::create_directory(path);
+        const auto pwd = std::filesystem::current_path();
+        std::filesystem::remove_all(pwd / dir);
+        std::filesystem::create_directories(pwd / dir);
       }
     }
 
