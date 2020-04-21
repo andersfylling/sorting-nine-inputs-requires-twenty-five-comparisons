@@ -62,7 +62,7 @@ private:
     set.metadata.netID = net.id;
 
     // populate the output set with all the sequences from <0, N^2]
-    for (::sortnet::sequence_t s{1}; s <= ::sortnet::sequence::binary::size<N>(); ++s) {
+    for (const auto s : ::sortnet::sequence::binary::all<N>) {
       const auto k{std::popcount(s) - 1};
       set.insert(k, s);
     }
@@ -225,14 +225,7 @@ constexpr bool marked(Set &setA, Set &setB) const {
           continue;
         }
 
-        if (!permutationConditions(setA, setB)) {
-#if (RECORD_INTERNAL_METRICS == 1)
-          metric->HasNoPermutation++;
-#endif
-          continue;
-        }
-
-        if (!subsumesByPermutation(setA, setB)) {
+        if (!(permutationConditions(setA, setB) && subsumesByPermutation(setA, setB))) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->HasNoPermutation++;
 #endif
@@ -428,10 +421,9 @@ public:
             continue;
           }
 
-          // apply new comparator and see if it causes a new change
+          // apply new comparator and see if it causes a different output set
           setBuffer.clear();
-          for (auto it{set.cbegin()}; it != set.cend(); ++it) {
-            ::sortnet::sequence_t s{*it};
+          for (const ::sortnet::sequence_t s : set) {
             const auto k{std::popcount(s) - 1};
             setBuffer.insert(k, c.apply(s));
           }
@@ -445,9 +437,9 @@ public:
           nets.at(counter) = net;
           nets.at(counter).id = idCounter;
           nets.at(counter).push_back(c);
-          sets.at(counter) = set;
+          sets.at(counter) = setBuffer;
           sets.at(counter).metadata.netID = idCounter;
-          sets.at(counter).computeMeta();
+          sets.at(counter).metadata.compute();
           ++counter;
           ++idCounter;
 
@@ -492,19 +484,20 @@ public:
 #endif
     };
 
-    auto prune = [&](const auto& file) -> uint64_t {
+    auto prune = [&](const auto& filename) -> uint64_t {
       auto* buffer = buffers.get();
       auto begin = buffer->setsFirst.begin();
       auto end = buffer->setsFirst.end();
 
-      auto size = storage.Load(file.set, layer, begin, end);
+      auto size = storage.Load(filename, layer, begin, end);
 #if (RECORD_INTERNAL_METRICS == 1)
       metric->FileRead++;
 #endif
       const auto originalSize{size};
+      end = begin + size;
 
-      markRedundantNetworks(begin, begin + size);
-      size = shiftRedundant(begin, begin + size);
+      markRedundantNetworks(begin, end);
+      size = shiftRedundant(begin, end);
       updateProgress();
       if (size == originalSize) {
         buffers.put(buffer);
@@ -512,19 +505,19 @@ public:
       }
 
       // write results to file
-      storage.Save(file.set, begin, begin + size);
+      storage.Save(filename, begin, begin + size);
 #if (RECORD_INTERNAL_METRICS == 1)
       metric->FileWrite++;
 #endif
-
 
       buffers.put(buffer);
       return originalSize - size;
     };
 
     std::vector<std::future<uint64_t>> results{};
+    results.reserve(filenames.size());
     for (const auto& file : filenames) {
-      results.emplace_back(pool.add(prune, file));
+      results.emplace_back(pool.add(prune, file.set));
     }
 
     pool.wait();
@@ -545,8 +538,9 @@ public:
     auto prune = [&](const std::string& filename, auto begin, auto end) -> uint32_t {
       auto* buffer = buffers.get();
       auto begin2 = buffer->setsFirst.begin();
+      auto end2 = buffer->setsFirst.end();
 
-      auto size = storage.Load(filename, layer, begin2, buffer->setsFirst.end());
+      auto size = storage.Load(filename, layer, begin2, end2);
 #if (RECORD_INTERNAL_METRICS == 1)
       metric->FileRead++;
 #endif
@@ -556,7 +550,7 @@ public:
       }
       const auto sizeBeforePruning{size};
 
-      auto end2 = begin2 + size;
+      end2 = begin2 + size;
       markRedundantNetworks(begin, end, begin2, end2);
       size = shiftRedundant(begin2, end2);
 
@@ -592,8 +586,12 @@ public:
         continue;
       }
 
-      for (std::size_t j{i + 1}; j < filenames.size(); ++j) {
-        results.emplace_back(pool.add(prune, file.set, sets.cbegin(), sets.cbegin() + size));
+      for (std::size_t j{0}; j < filenames.size(); ++j) {
+        if (j == i) {
+          continue;
+        }
+        const auto& filename{filenames.at(j).set};
+        results.emplace_back(pool.add(prune, filename, sets.cbegin(), sets.cbegin() + size));
       }
       pool.wait();
 
@@ -607,10 +605,11 @@ public:
       bar.display();
 #endif
     }
+    buffers.put(buffer);
+
 #if (PRINT_PROGRESS == 1)
     bar.done();
 #endif
-
     return pruned;
   }
 
@@ -646,7 +645,7 @@ public:
 #if (RECORD_IO_TIME == 1)
     ioTime = "-";
 #endif
-    t.add_row({"Total so far", dec(metrics.Seconds()) + "s", "-", ioTime});
+    t.add_row({"Sum(layers)", dec(metrics.Seconds()) + "s", "-", ioTime});
 
     for (std::size_t i{1}; i < columns; ++i) {
       t.column(i).format().font_align(tabulate::FontAlign::right);

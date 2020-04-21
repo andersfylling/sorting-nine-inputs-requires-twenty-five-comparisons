@@ -16,8 +16,8 @@
 #include <sortnet/networks/Network.h>
 #include <sortnet/persistentStorage.h>
 
-constexpr uint8_t NrOfCores{7};
-constexpr uint8_t N{7};
+constexpr uint8_t Threads{8};
+constexpr uint8_t N{8};
 
 template <uint8_t N, uint8_t K = ::sortnet::networkSizeUpperBound<N>()>
 constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
@@ -25,7 +25,7 @@ constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
   using Net     = ::sortnet::network::Network<N, K>;
   using Storage = ::sortnet::PersistentStorage<Net, Set, N, K>;
 
-  auto g = GenerateAndPrune<N, K, NrOfCores, Set, Net, Storage>{};
+  auto g = GenerateAndPrune<N, K, Threads - 1, Set, Net, Storage>{};
   return g.run();
 }
 

@@ -20,12 +20,12 @@ namespace sortnet::set {
     constexpr ListNaive() = default;
     constexpr ListNaive(const ListNaive &rhs) : metadata(rhs.metadata) {
       // do not use =default as this copies a std::list reference
-      std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), seqs.begin());
+      std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), std::back_inserter(seqs));
     };
     constexpr ListNaive &operator=(const ListNaive &rhs) {
       metadata = rhs.metadata;
       seqs.clear();
-      std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), seqs.begin());
+      std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), std::back_inserter(seqs));
       return *this;
     };
     constexpr bool operator==(const ListNaive &rhs) {
@@ -86,17 +86,16 @@ namespace sortnet::set {
 
     // iterator
     using const_iterator = typename std::list<sequence_t>::const_iterator;
-    using iterator = typename std::list<sequence_t>::iterator;
-    iterator begin() { return seqs.begin(); }
+    [[nodiscard]] const_iterator begin() const noexcept { return seqs.cbegin(); }
     [[nodiscard]] const_iterator cbegin() const noexcept { return seqs.cbegin(); }
-    iterator end() { return seqs.end(); }
+    [[nodiscard]] const_iterator end() const noexcept { return seqs.cend(); }
     [[nodiscard]] const_iterator cend() const noexcept { return seqs.cend(); }
 
     // file manipulation
     void write(std::ostream &f) const {
       metadata.write(f);
 
-      uint16_t _size{size()};
+      int32_t _size{size()};
       binary_write(f, _size);
 
       for (const sequence_t s : seqs) {
@@ -108,10 +107,10 @@ namespace sortnet::set {
       clear();
       metadata.read(f);
 
-      uint16_t _size{0};
+      int32_t _size{0};
       binary_read(f, _size);
 
-      for (uint16_t i{0}; i < _size; ++i) {
+      for (int32_t  i{0}; i < _size; ++i) {
         sequence_t s{0};
         binary_read(f, s);
         seqs.push_back(s);

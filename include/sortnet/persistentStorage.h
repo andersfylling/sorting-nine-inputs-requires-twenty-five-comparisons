@@ -91,12 +91,11 @@ namespace sortnet {
 #if (RECORD_IO_TIME == 1)
       const auto start = std::chrono::steady_clock::now();
 #endif
-      // TODO: add filter argument, using a boolean lambda
       std::ofstream f{filename, std::ios::binary | std::ios::trunc};
       f.unsetf(std::ios_base::skipws);
 
       // number of networks/sets
-      const uint32_t distance{static_cast<uint32_t>(std::distance(begin, end))};
+      const int32_t distance{static_cast<int32_t>(std::distance(begin, end))};
       binary_write(f, distance);
 
       // the actual content
@@ -132,11 +131,11 @@ namespace sortnet {
       std::ifstream f{filename, std::ios::in | std::ios::binary};
       f.unsetf(std::ios_base::skipws);
 
-      uint32_t limit{};
+      int32_t limit{};
       binary_read(f, limit);
 
-      uint32_t counter{0};
-      for (; it != end && counter < limit; ++it) {
+      int32_t counter{0};
+      for (; (it != end && counter < limit) ; ++it) { //&& (layer <= 2 && counter < 3)
         it->read(f);
         ++counter;
       }
