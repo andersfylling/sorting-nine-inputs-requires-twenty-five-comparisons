@@ -1,8 +1,8 @@
-[![Actions Status](https://github.com/TheLartians/ModernCppStarter/workflows/MacOS/badge.svg)](https://github.com/TheLartians/ModernCppStarter/actions)
-[![Actions Status](https://github.com/TheLartians/ModernCppStarter/workflows/Windows/badge.svg)](https://github.com/TheLartians/ModernCppStarter/actions)
-[![Actions Status](https://github.com/TheLartians/ModernCppStarter/workflows/Ubuntu/badge.svg)](https://github.com/TheLartians/ModernCppStarter/actions)
-[![Actions Status](https://github.com/TheLartians/ModernCppStarter/workflows/Style/badge.svg)](https://github.com/TheLartians/ModernCppStarter/actions)
-[![codecov](https://codecov.io/gh/TheLartians/ModernCppStarter/branch/master/graph/badge.svg)](https://codecov.io/gh/TheLartians/ModernCppStarter)
+[![Actions Status](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/workflows/MacOS/badge.svg)](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/actions)
+[![Actions Status](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/workflows/Windows/badge.svg)](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/actions)
+[![Actions Status](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/workflows/Ubuntu/badge.svg)](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/actions)
+[![Actions Status](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/workflows/Style/badge.svg)](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/actions)
+[![codecov](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/branch/master/graph/badge.svg)](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons)
 
 # About
 This is a _*third-party*_ c++ implementation of the paper "*Sorting nine inputs requires twenty-five comparisons*"[1]. It exists to make a reliable reference point for other researchers that wants to compare the performance of their ideas/findings.
