@@ -188,4 +188,4 @@ template <uint8_t N> std::string to_string(permutation_t<N> p) {
 
   return ss.str();
 }
-}  // namespace sortnet
+}  // namespace sortnet::permutation
