@@ -23,7 +23,7 @@ template <uint8_t N, uint8_t K = ::sortnet::networkSizeUpperBound<N>()>
 constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
   using Set = ::sortnet::set::ListNaive<N, K>;
   using Net = ::sortnet::network::Network<N, K>;
-  using Storage = ::sortnet::PersistentStorage<Net, Set, N, K>;
+  using Storage = PersistentStorage<Net, Set, N, K>;
 
   auto g = GenerateAndPrune<N, K, Threads - 1, Set, Net, Storage>{};
   return g.run();

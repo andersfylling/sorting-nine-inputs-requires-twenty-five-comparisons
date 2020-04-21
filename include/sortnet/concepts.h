@@ -3,8 +3,7 @@
 #include "sortnet/comparator.h"
 #include "sortnet/sequence.h"
 
-namespace sortnet {
-namespace concepts {
+namespace sortnet::concepts {
 template <class T> concept ComparatorNetwork = requires(T net, sequence_t s, Comparator c) {
   { net.size() }
   ->std::size_t;
@@ -30,5 +29,4 @@ template <class T> concept Set = requires(T set, T other, uint8_t k, sequence_t 
   {set.clear()};
   {set.computeMeta()};
 };
-}  // namespace concepts
-}  // namespace sortnet
+}  // namespace sortnet::concepts

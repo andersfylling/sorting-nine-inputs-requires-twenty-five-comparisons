@@ -5,10 +5,9 @@
 [![codecov](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/branch/master/graph/badge.svg)](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons)
 
 # About
-This is a _*third-party*_ c++ implementation of the paper "*Sorting nine inputs requires twenty-five comparisons*"[1]. It exists to make a reliable reference point for other researchers that wants to compare the performance of their ideas/findings.
+This is a **third-party** implementation of the paper ["*Sorting nine inputs requires twenty-five comparisons*"](https://www.sciencedirect.com/science/article/pii/S0022000015001397) [1] in c++. It exists to make a reliable reference point for future projects that needs to measure the runtime reduction of their ideas/findings, with regards to [the minimum comparator network size problem](https://en.wikipedia.org/wiki/Sorting_network) [3].
 
-The core logic will not receive further changes as it is considered "complete" - in the sense that the implementation is correct. However, code design, naming, or anything that improves on readability are acceptable changes.
- 
+This project is considered feature complete as the core methods are implemented in a naive/simple manner of their prolog version. However, code design, naming, or anything that improves on readability are changes of interest. 
 
 ## Features
 
@@ -16,117 +15,30 @@ The core logic will not receive further changes as it is considered "complete" -
 - Scalable memory usage
 - Minimal heap allocations
 - Test suite
-- Somewhat modular code
+- A library
+- Easy to add and implement your own ideas
 
 TODO: benchmark
 
 ## Code flow
-The generate and prune approach, is what it sounds; it generates all the networks and their output sets for a given layer and then compares the outputs sets against each other in order to remove redundant networks.
+The goal is to find a network with size K that has no smaller network able to sort a sequence of N elements. In order to do so a weak proof algorithm must be implemented that proves no smaller network exist by exploring all configurations. This is also known as brute forcing. As such the program starts with a network of zero comparators and derives all possible configurations using a [breadth first search](https://en.wikipedia.org/wiki/Breadth-first_search) [4] until a sorting network is discovered. Because every network configuration of size K is explored step wise, we know that there is no network of size K-1 that can sort a sequence of N elements - which ultimately becomes the proof that the discovered sorting network is in fact the smallest size.  
 
-To detect early on if a network does not subsume another by permutation, several preconditions can be used, the first one being that a set A can only subsume a set B by checking the size: size(A) <= size(B). The remaining preconditions can be found below (lemma 4 and lemma 5). The worst case lookup/comparisons of output sets can be identified by a nth triangle of M => M(M+1)/2. Where M is the number of network generated.
+However, there is no need to explore every single network as the comparators are independent functions - instead the output sets can be generated using the [zero-one principle](http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html) [5] and redundant networks can be pruned using subsumption. This is further improved upon by permuting the output set to take advantage of breaking symmetries within a step or layer (where the sets compared comes from networks with equal size).
 
-## Core logic
-This section details the significant findings that allows reduces the problem space.
+The generate and prune approach, is what it sounds; it generates all the networks, then identifies redundant networks through symmetry and prune redundant ones. This is the basic concept of the search space. The paper [1] explores preconditions for identifying whether two output sets may subsume one another - that are much quicker than the complete subsumption test. These are referred to as ST1, ST2, ST3 in the code.
 
-### Lemma 2
+This project differs from the prolog code, by working with segments of networks and their output sets. It is not explicitly clear to me how prolog does this internally - regardless, by working on segments instead of singular networks it becomes easier to visualize the multi-threading aspects of the code. Once work is done on a segment, the result or updated segment is written it's own file. Networks and output sets do not share the same file, but merely a segment ID to reduce overall IO. From my understanding the prolog version, for every layer, writes the generated networks and output sets to a single file and then the pruned version to a new file once that layer is fully explored. 
 
-> Let Ca and Cb be comparator networks on n channels, both of the same size, and such that Ca subsumes Cb. Then, if there exists a sorting network Cb;C of size k, there also exists a sorting network Ca;C of size k.
+### Multi-threading
 
-I'll explain this in two parts. 
-1. If the two networks produce output sets with the same size (the output sets are the same), then the combination of comparators required to sort the output sets are exactly the same.
-2. If Ca produces a output set that subsumes (exists within) the output set of Cb, then the output set of Ca would require the same amount of comparators or less than the output set of Cb to become sorted. Since we only care anout the minimal number of comparators, and not how the networks actually look, we can view this as a "survival of the fittest" type of situation where the cost function is the number of comparators required to sort a output set.
+Each layer can be split up into 3 parts; generating, pruning within segments (files) and pruning across segments (files). The generator phase is single threaded as it only wastes a few minutes on N9, while the multi-threaded pruning phases can take several hours to complete. 
 
-### Lemma 4
+Pruning within segments (files) tells each thread to work on a single segment. Since each segment is isolated, there is no need for locking and the implementation quickly becomes IO bound as the number of sets/networks reduces per segment on N9. But as N increases the complexity of pruning may go beyond the IO penalties.
 
-> Let Ca and Cb be n-channel comparator networks. If there exists 1 ≤ k ≤ n such that the number of sequences with k 1s in outputs(Ca) is greater than that in outputs(Cb), then Ca does not subsumes Cb.
+Pruning across segments (files) have the same issue with IO, but must also share memory across threads. After talking with an author from the paper [1] the approach was to mark one segment as read only, and the remaining segments as writeable. Where a writeable segment can only have ownership by one thread. Then every thread can share the read-only segment and see if any of the output sets subsumes any output set in the write-able segment the thread has ownership off. Once every write-able segment has been compared to the read-only segment, the process selects a different segment to be marked as read-only and the rest as write-able. Thanks to this, every output set is correctly compared across segments without the need for synchronization between jobs.
 
-This lemma states that after we partition a set based on the number of set bits in the entries, we can check if two networks subsumes by checking the number of entries in each partition.
+![](.github/multithreading-across-segments.gif)
 
-##### Example
-Say we have the set `A={001, 010, 011}` and the set `B={010, 011, 101}`. I denote part(S, k) for a partition of a set S where the entries have k bits. eg. `part({010, 110}, 1) => {010}`. 
-By taking the partition k(1) for set A and B, we see that part(A, k) has more elements than part(B, k), where k is 1.
-```
-  part(A, 1) => {001, 010} 
-  part(B, 1) => {010}
-```
-
-As such, A can not subsumes B. And there is no reason to do further more expensive tests.
-
-The effect of this lemma is that instead of testing if every entry in A exists in B, which has a potential worst case of O(N^2 * N^2), we can use lemma 4 as a precondition and reduce the worst case to O(N-1). Allowing for fail fast, or quickly skipping a significant number of checks. In the paper they stated than more than 70% of the subsumption tests where eliminated thanks to lemma 4.
-
-### Lemma 5
-
-> Let Ca and Cb be n-channel comparator networks. If for some x∈{0, 1} and 1 ≤ k ≤ n, |w(Ca, x, k)| > |w(Cb, x, k)| then Ca does not subsume Cb.
-
-This lemma states that the sizes of a condensed representation of all the activated bits and the non-activated bits, the ones and the zeros, can be used as another precondition for subsumption. This again, works on a per partition basis, which makes up for some of the inaccuracy of using a condenced view.
-
-The focus is on the number of positions a activated bit can move around. When a permutation is applied, the number of activated bits in the once and zero representation for each partition do not change and therefore we can check for subsumption by number of ones and zeros.
-
-##### Example
-In this example we focus on a specific partition, instead of writing an entire set. Remember that a partition must be able to subsume another where the number of activated bits are the same.
-
-```
-part(A, 2) = {00011, 10010, 01010}
-part(B, 2) = {00011, 01001, 01010}
-``` 
-Lemma 4 would not detect this situation as it notices the size of size(part(A, 2)) subsumes size(part(B, 2)). 
-
-But if we created the ones and the zeros for each of the sets respectively, we notice something stands out.
-```
-ones(part(A, 2)) = {0,2,4,5}
-ones(part(B, 2)) = {2,4,5}
-```
-
-We see that the ones for part(A, 2) has more activated bits than part(B, 2). By lemma 5, this states that A can not subsume B.
-
-#### Example - calculate ones and zeros
-Given a binary sequence s1 = 0101101, we can calculate the ones(s1) = {1,3,4,6}. In the papers we assign the first position 0, starting from left to right. And we can write s1 as a ordered set instead: s1 = (0, 1, 0, 1, 1, 0, 1).
-Looping over this ordered set, we record when the value is 1:
-
-```
-def ones(sequence):
-    ones = []
-    for bit, pos in sequence:
-        if bit == 1:
-            ones.append(pos)
-    return ones
-```
-
-To calculate the zeros of a sequence, we simply take the inverse of the sequence: ~s1 = 1010010. zeros(s1) = {0, 2, 5}.
-
-```
-def zeros(sequence):
-    inverted = ~sequence
-    return ones(inverted)
-```
-
-We can now use this logic to create a concensed representation of a set. Below we define the psuedo code to make this work.
-```
-def ones(set):
-    positions = []
-    for sequence in set:
-        for pos in ones(sequence):
-            if positions.contains(pos):
-                continue
-            positions.append(pos)
-    return positions
-
-def zeros(set):
-    for i in range(set):
-        set[i] = ~set[i]
-    return ones(set)
-```
-
-### Lemma 6
-
-> Let Ca and Cb be n-channel comparator networks and π be a permutation. If π(outputs(Ca)) ⊆ outputs(Cb), then π(w(Ca, x, k)) ⊆ w(Cb, x, k) for all x∈{0, 1}, 1 ≤ k ≤ n.
-
-The main idea of this is to show that we can use the ones and zeros from each partition to figure out or generate plausible permutations. Due to the condenced nature of the ones and zeros, this yields some inaccuracy and will generate permutations that will not cause the two sets to subsume. However, if they subsume a permutation, this will find it.
-You can think about the valid permutations for this statement to exist as a subset within the generated permutations using the ones and the zeros from each partition.
-
-This is probably the most significant statement that allows scaling. While exploring all permutations of N (N!) can take a few seconds for N7, it took me 20 hours for N8 on a single core. Once I moved to generating the permutations instead the runtime of N8 reduced to minutes.
-
-There have previously been misinterpretations of lemma 6[1, page 9] where at first glance it seems that all possible permutations for a N-sized sequence are explored[2], as in applying N! permutations and test for subsumption. This is simply not the case as the prolog implementation uses backtracking to generate possible permutations. I tried exploring all permutations for N8 in this way, and it took the C++ implementation around 20 hours on a single core, while the prolog version takes 3 hours (one of the authors[1] let me try their code on my personal computer).
 
 ## Contributing
 
@@ -175,3 +87,6 @@ See [Format.cmake](https://github.com/TheLartians/Format.cmake) for more options
 
  - [1] https://www.sciencedirect.com/science/article/pii/S0022000015001397
  - [2] https://www.researchgate.net/publication/318729549_An_Improved_Subsumption_Testing_Algorithm_for_the_Optimal-Size_Sorting_Network_Problem
+ - [3] https://en.wikipedia.org/wiki/Sorting_network
+ - [4] https://en.wikipedia.org/wiki/Breadth-first_search
+ - [5] http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html

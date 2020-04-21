@@ -1,13 +1,14 @@
 #pragma once
 
-#include <sortnet/sets/Metadata.h>
-#include <sortnet/z_environment.h>
-
 #include <algorithm>
 #include <list>
 
-#include "sortnet/permutation.h"
-#include "sortnet/sequence.h"
+#include <sortnet/sets/Metadata.h>
+#include <sortnet/io.h>
+#include <sortnet/permutation.h>
+#include <sortnet/sequence.h>
+
+#include <sortnet/z_environment.h>
 
 namespace sortnet::set {
 template <uint8_t N, uint8_t K> class ListNaive {
@@ -19,7 +20,6 @@ public:
 
   constexpr ListNaive() = default;
   constexpr ListNaive(const ListNaive &rhs) : metadata(rhs.metadata) {
-    // do not use =default as this copies a std::list reference
     std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), std::back_inserter(seqs));
   };
   constexpr ListNaive &operator=(const ListNaive &rhs) {
@@ -35,9 +35,6 @@ public:
 
     return std::equal(seqs.cbegin(), seqs.cend(), rhs.cbegin());
   }
-
-  // deprecated
-  constexpr void reset() { clear(); }
 
   constexpr void clear() {
     seqs.clear();

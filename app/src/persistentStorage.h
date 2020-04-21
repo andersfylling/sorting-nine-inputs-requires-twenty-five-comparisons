@@ -8,12 +8,11 @@
 #include <map>
 #include <string>
 
-#include "io.h"
 #include "sortnet/concepts.h"
+#include "sortnet/io.h"
 #include "sortnet/json.h"
 #include "sortnet/z_environment.h"
 
-namespace sortnet {
 template <::sortnet::concepts::ComparatorNetwork Net, ::sortnet::concepts::Set Set, uint8_t N,
           uint8_t K>
 class PersistentStorage {
@@ -149,4 +148,3 @@ public:
     return counter;
   }
 };
-}  // namespace sortnet

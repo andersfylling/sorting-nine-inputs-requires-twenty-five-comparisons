@@ -6,7 +6,7 @@
 #include <array>
 #include <string>
 
-#include "../../app/src/io.h"
+#include "io.h"
 
 namespace sortnet {
 class Comparator {

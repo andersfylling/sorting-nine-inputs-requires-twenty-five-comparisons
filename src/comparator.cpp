@@ -1,4 +1,5 @@
 #include <sortnet/comparator.h>
+#include <sortnet/io.h>
 
 namespace sortnet {
 void Comparator::write(std::ostream &f) const {
