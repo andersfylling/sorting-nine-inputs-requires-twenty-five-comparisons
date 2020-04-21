@@ -17,11 +17,11 @@
 #include <tabulate/table.hpp>
 #include <vector>
 
-#include "vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
 #include "BufferPool.h"
 #include "progress.h"
 #include "sortnet/comparator.h"
 #include "sortnet/sequence.h"
+#include "vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
 
 struct NetAndSetFilename {
   const std::string net;
