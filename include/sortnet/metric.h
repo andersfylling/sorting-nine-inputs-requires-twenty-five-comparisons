@@ -1,14 +1,14 @@
 #pragma once
 
+#include <sortnet/json.h>
+#include <sortnet/util.h>
+
 #include <array>
 #include <cstdint>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <string_view>
-
-#include <sortnet/json.h>
-#include <sortnet/util.h>
 
 namespace sortnet {
   class MetricLayer {
@@ -68,7 +68,7 @@ namespace sortnet {
     void to_json(::nlohmann::json &j) const;
   };
 
-  void to_json(nlohmann::json& j, const MetricLayer& m);
+  void to_json(nlohmann::json &j, const MetricLayer &m);
 
   std::string comparisonTable(const MetricLayer &n7k9, const MetricLayer &n7k10);
 

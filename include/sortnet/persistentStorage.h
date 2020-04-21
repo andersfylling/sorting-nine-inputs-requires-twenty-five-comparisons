@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <filesystem>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <map>
@@ -123,8 +123,9 @@ namespace sortnet {
       f.close();
     }
 
-    template <typename iterator>
-    uint32_t Load(const std::string &filename, [[maybe_unused]] uint8_t layer, iterator it, iterator end) {
+    template <typename iterator> uint32_t Load(const std::string &filename,
+                                               [[maybe_unused]] uint8_t layer, iterator it,
+                                               iterator end) {
 #if (RECORD_IO_TIME == 1)
       const auto start = std::chrono::steady_clock::now();
 #endif
@@ -135,7 +136,7 @@ namespace sortnet {
       binary_read(f, limit);
 
       int32_t counter{0};
-      for (; (it != end && counter < limit) ; ++it) { //&& (layer <= 2 && counter < 3)
+      for (; (it != end && counter < limit); ++it) {  //&& (layer <= 2 && counter < 3)
         it->read(f);
         ++counter;
       }

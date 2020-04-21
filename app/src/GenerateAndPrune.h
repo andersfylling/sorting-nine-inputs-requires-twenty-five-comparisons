@@ -1,23 +1,5 @@
 #pragma once
 
-#include <array>
-#include <bit>
-#include <iostream>
-#include <list>
-#include <vector>
-#include <algorithm>
-#include <bit>
-#include <chrono>
-#include <future>
-#include <iostream>
-#include <map>
-#include <tabulate/table.hpp>
-#include <vector>
-
-#include "progress.h"
-
-#include "sortnet/comparator.h"
-#include "sortnet/sequence.h"
 #include <sortnet/BufferPool.h>
 #include <sortnet/concepts.h>
 #include <sortnet/json.h>
@@ -25,6 +7,21 @@
 #include <sortnet/permutation.h>
 #include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
 #include <sortnet/z_environment.h>
+
+#include <algorithm>
+#include <array>
+#include <bit>
+#include <chrono>
+#include <future>
+#include <iostream>
+#include <list>
+#include <map>
+#include <tabulate/table.hpp>
+#include <vector>
+
+#include "progress.h"
+#include "sortnet/comparator.h"
+#include "sortnet/sequence.h"
 
 struct NetAndSetFilename {
   const std::string net;
@@ -42,16 +39,16 @@ private:
   ::sortnet::BufferPool<Set, Net, NrOfCores, ::sortnet::segment_capacity> buffers{};
 
   ::sortnet::MetricsLayered<N, K> metrics{};
-  ::sortnet::MetricLayer *metric = &metrics.at(0);
+  ::sortnet::MetricLayer* metric = &metrics.at(0);
 
   ::dbr::cc::ThreadPool pool;
 
   constexpr void storeEmptyNetworkWithOutputSet() {
     // we store an empty network and a complete output set
     std::array<Net, 1> _networks{};
-    auto &net{_networks.at(0)};
+    auto& net{_networks.at(0)};
     std::array<Set, 1> _sets{};
-    auto &set{_sets.at(0)};
+    auto& set{_sets.at(0)};
 
     // cleanup
     net.clear();
@@ -106,7 +103,7 @@ private:
     return counter;
   }
 
-  constexpr bool subsumesByPermutation(const Set &setA, const Set &setB) const {
+  constexpr bool subsumesByPermutation(const Set& setA, const Set& setB) const {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST4Calls++;
 #endif
@@ -123,7 +120,7 @@ private:
 #endif
 
     return ::sortnet::permutation::generate<N>(
-        constraints, [&](const ::sortnet::permutation::permutation_t<N> &p) {
+        constraints, [&](const ::sortnet::permutation::permutation_t<N>& p) {
 #if (RECORD_INTERNAL_METRICS == 1)
           metric->Permutations++;
 #endif
@@ -131,7 +128,7 @@ private:
         });
   }
 
-  constexpr bool permutationConditions(const Set &setA, const Set &setB) const {
+  constexpr bool permutationConditions(const Set& setA, const Set& setB) const {
 #if (RECORD_INTERNAL_METRICS == 1)
     metric->ST1Calls++;
 #endif
@@ -159,34 +156,34 @@ private:
     return true;
   }
 
-// compare two sets and check if they can be subsumed by a permutation
-// return true if the first set is marked (allowing fail fast)
-constexpr bool marked(Set &setA, Set &setB) const {
+  // compare two sets and check if they can be subsumed by a permutation
+  // return true if the first set is marked (allowing fail fast)
+  constexpr bool marked(Set& setA, Set& setB) const {
     if (permutationConditions(setA, setB) && subsumesByPermutation(setA, setB)) {
 #if (RECORD_INTERNAL_METRICS == 1)
-        metric->Subsumptions++;
+      metric->Subsumptions++;
 #endif
-        setB.metadata.marked = true;
-        return false;
+      setB.metadata.marked = true;
+      return false;
     } else {
 #if (RECORD_INTERNAL_METRICS == 1)
-        metric->HasNoPermutation++;
+      metric->HasNoPermutation++;
 #endif
     }
 
     if (permutationConditions(setB, setA) && subsumesByPermutation(setB, setA)) {
 #if (RECORD_INTERNAL_METRICS == 1)
-        metric->Subsumptions++;
+      metric->Subsumptions++;
 #endif
-        setA.metadata.marked = true;
-        return true;
+      setA.metadata.marked = true;
+      return true;
     } else {
 #if (RECORD_INTERNAL_METRICS == 1)
-        metric->HasNoPermutation++;
+      metric->HasNoPermutation++;
 #endif
     }
     return false;
-}
+  }
 
   // mark redundant sets within a file
   template <typename II> constexpr void markRedundantNetworks(II it, const II end) const {
@@ -210,9 +207,9 @@ constexpr bool marked(Set &setA, Set &setB) const {
   }
 
   // mark redundant sets across two files
-  template <typename II, typename IIMut> constexpr void markRedundantNetworks(const II begin1, const II end1,
-                                                              const IIMut begin2,
-                                                              const IIMut end2) const {
+  template <typename II, typename IIMut>
+  constexpr void markRedundantNetworks(const II begin1, const II end1, const IIMut begin2,
+                                       const IIMut end2) const {
     for (II it1{begin1}; it1 != end1; ++it1) {
       const Set& setA{*it1};
       if (setA.metadata.marked) {
@@ -255,8 +252,9 @@ public:
       const auto mcs = std::chrono::duration_cast<std::chrono::microseconds>(d).count();
       return microsecondsToSeconds(mcs);
     };
-    auto now
-        = []() -> std::chrono::steady_clock::time_point { return std::chrono::steady_clock::now(); };
+    auto now = []() -> std::chrono::steady_clock::time_point {
+      return std::chrono::steady_clock::now();
+    };
 
     // #############################################
     //
@@ -327,10 +325,10 @@ public:
 
 #if (RECORD_IO_TIME == 1)
       const auto fileIODuration = nanosecondsToSeconds(storage.duration);
-    storage.duration = 0;
+      storage.duration = 0;
 
 #  if (PRINT_LAYER_SUMMARY == 1)
-    printLayerSummary(layer, fileIODurationGen, fileIODuration);
+      printLayerSummary(layer, fileIODurationGen, fileIODuration);
 #  endif
 #else
 #  if (PRINT_LAYER_SUMMARY == 1)
@@ -350,7 +348,7 @@ public:
   }
 
   template <typename Functor>
-  uint64_t read(const NetAndSetFilename &file, uint8_t layer, Functor _f) {
+  uint64_t read(const NetAndSetFilename& file, uint8_t layer, Functor _f) {
     constexpr uint32_t FileSize{::sortnet::segment_capacity};
 
     std::vector<Set> sets(FileSize);
@@ -613,7 +611,9 @@ public:
     return pruned;
   }
 
-  void printLayerSummary([[maybe_unused]] uint8_t layer, [[maybe_unused]] double_t fileIODurationGen, [[maybe_unused]] double_t fileIODuration) {
+  void printLayerSummary([[maybe_unused]] uint8_t layer,
+                         [[maybe_unused]] double_t fileIODurationGen,
+                         [[maybe_unused]] double_t fileIODuration) {
     auto dec = [](const double_t v) -> std::string {
       const auto precision = 2;
       return std::to_string(v).substr(0, std::to_string(v).find(".") + precision + 1);
@@ -627,8 +627,8 @@ public:
 #if (RECORD_IO_TIME == 1)
     ioTime = dec(fileIODurationGen);
 #endif
-    t.add_row({"Generating", dec(metric->DurationGenerating) + "s", std::to_string(metric->Generated),
-               ioTime});
+    t.add_row({"Generating", dec(metric->DurationGenerating) + "s",
+               std::to_string(metric->Generated), ioTime});
 
 #if (RECORD_IO_TIME == 1)
     ioTime = "-";

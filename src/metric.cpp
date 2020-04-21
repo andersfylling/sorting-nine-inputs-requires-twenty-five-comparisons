@@ -13,9 +13,7 @@ namespace sortnet {
     return str;
   }
 
-  void to_json(nlohmann::json& j, const MetricLayer& m) {
-    m.to_json(j);
-  }
+  void to_json(nlohmann::json &j, const MetricLayer &m) { m.to_json(j); }
 
   void MetricLayer::to_json(::nlohmann::json &j) const {
     auto add = [&](const std::string &name, const auto &v) { j[name] = v; };

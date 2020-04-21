@@ -110,8 +110,7 @@ namespace sortnet {
   }
 
   // same as in papers => (from, to); (from, to); etc.
-  template <uint8_t N>
-  std::string to_string(Comparator c) {
+  template <uint8_t N> std::string to_string(Comparator c) {
     constexpr auto base{N - 1};
     return "(" + ::std::to_string(int(base - c.from)) + "," + ::std::to_string(int(base - c.to))
            + ");";

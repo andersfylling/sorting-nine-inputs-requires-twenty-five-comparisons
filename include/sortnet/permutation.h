@@ -62,7 +62,7 @@ namespace sortnet {
       set.clear();
       for (const sequence_t s : sequences) {
         const sequence_t permuted = apply<N>(p, s);
-        const uint8_t k = std::popcount(permuted);
+        const uint8_t k = std::popcount(permuted - 1);
         set.insert(k, permuted);
       }
     }

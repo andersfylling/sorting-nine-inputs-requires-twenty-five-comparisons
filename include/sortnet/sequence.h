@@ -26,7 +26,7 @@ namespace sortnet {
 
     template <uint8_t N> constexpr std::size_t size() {
       static_assert(N > 1, "N must be above 1");
-      return (std::numeric_limits<sequence_t>::max() & mask<N>) - 1;
+      return (std::numeric_limits<sequence_t>::max() & mask<N>)-1;
     }
 
     // all sequences from 1 until the last integer with N set bits

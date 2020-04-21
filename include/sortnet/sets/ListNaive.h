@@ -50,7 +50,8 @@ namespace sortnet::set {
       return std::find(seqs.cbegin(), seqs.cend(), s) != seqs.cend();
     }
 
-    [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k, const sequence_t s) const {
+    [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k,
+                                          const sequence_t s) const {
       return contains(s);
     }
 
@@ -110,11 +111,11 @@ namespace sortnet::set {
       int32_t _size{0};
       binary_read(f, _size);
 
-      for (int32_t  i{0}; i < _size; ++i) {
+      for (int32_t i{0}; i < _size; ++i) {
         sequence_t s{0};
         binary_read(f, s);
         seqs.push_back(s);
       }
     }
   };
-}  // namespace sortnet
+}  // namespace sortnet::set

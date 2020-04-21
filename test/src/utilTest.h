@@ -9,9 +9,7 @@
 
 template <uint8_t N, ::sortnet::concepts::ComparatorNetwork net_t, ::sortnet::concepts::Set set_t>
 constexpr void populate(const net_t& net, set_t& set) {
-  constexpr ::sortnet::sequence_t mask{::sortnet::sequence::binary::genMask<N>()};
-  constexpr auto max = std::numeric_limits<::sortnet::sequence_t>::max() & mask;
-  for (::sortnet::sequence_t s{1}; s < max; s++) {
+  for (::sortnet::sequence_t s : ::sortnet::sequence::binary::all<N>) {
     const auto k{std::popcount(s) - 1};
     set.insert(k, net.run(s));
   }

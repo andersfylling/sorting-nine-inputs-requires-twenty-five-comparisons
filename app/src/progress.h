@@ -57,7 +57,7 @@ public:
   }
 
   void done() {
-    for (int64_t i{total_ticks-ticks}; i >= 0; --i) {
+    for (int64_t i{total_ticks - ticks}; i >= 0; --i) {
       ++bar;
     }
     print();
