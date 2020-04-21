@@ -167,11 +167,9 @@ namespace sortnet {
 
     template <uint8_t N, ::sortnet::concepts::Set Set>
     constexpr bool subsumes(const permutation_t<N> &p, const Set &setA, const Set &setB) {
-      for (auto it{setA.cbegin()}; it != setA.cend(); ++it) {
-        const sequence_t s{*it};
-
+      for (const sequence_t s : setA) {
         const auto permuted{permutation::apply<N>(p, s)};
-        if (!setB.contains(permuted)) {
+        if (!setB.contains(permuted)) { // O(setB.size())
           return false;
         }
       }

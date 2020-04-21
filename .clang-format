@@ -10,7 +10,6 @@
   IncludeBlocks: Regroup
   IndentPPDirectives: AfterHash
   IndentWidth: '2'
-  NamespaceIndentation: All
   BreakBeforeBinaryOperators: All
   BreakBeforeTernaryOperators: 'true'
 ...
