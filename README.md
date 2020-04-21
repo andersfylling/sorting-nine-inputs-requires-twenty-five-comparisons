@@ -13,10 +13,12 @@ The core logic will not receive further changes as it is considered "complete" -
 ## Features
 
 - Multi-threading
-- Scalable memory usage (segments of networks and sets are written/read from files)
+- Scalable memory usage
 - Minimal heap allocations
 - Test suite
 - Somewhat modular code
+
+TODO: benchmark
 
 ## Code flow
 The generate and prune approach, is what it sounds; it generates all the networks and their output sets for a given layer and then compares the outputs sets against each other in order to remove redundant networks.
