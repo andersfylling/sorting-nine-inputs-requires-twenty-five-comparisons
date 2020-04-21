@@ -35,6 +35,8 @@ Each layer can be split up into 3 parts; generating, pruning within segments (fi
 
 Pruning within segments (files) tells each thread to work on a single segment. Since each segment is isolated, there is no need for locking and the implementation quickly becomes IO bound as the number of sets/networks reduces per segment on N9. But as N increases the complexity of pruning may go beyond the IO penalties.
 
+![](.github/multithreading-within-segments.gif)
+
 Pruning across segments (files) have the same issue with IO, but must also share memory across threads. After talking with an author from the paper [1] the approach was to mark one segment as read only, and the remaining segments as writeable. Where a writeable segment can only have ownership by one thread. Then every thread can share the read-only segment and see if any of the output sets subsumes any output set in the write-able segment the thread has ownership off. Once every write-able segment has been compared to the read-only segment, the process selects a different segment to be marked as read-only and the rest as write-able. Thanks to this, every output set is correctly compared across segments without the need for synchronization between jobs.
 
 ![](.github/multithreading-across-segments.gif)
