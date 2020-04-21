@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "../../../app/src/io.h"
 #include "../z_environment.h"
 #include "sortnet/comparator.h"
-#include "sortnet/io.h"
 
 namespace sortnet {
   namespace network {

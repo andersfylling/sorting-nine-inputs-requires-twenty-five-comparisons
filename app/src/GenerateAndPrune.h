@@ -1,11 +1,9 @@
 #pragma once
 
-#include <sortnet/BufferPool.h>
 #include <sortnet/concepts.h>
 #include <sortnet/json.h>
 #include <sortnet/metric.h>
 #include <sortnet/permutation.h>
-#include <sortnet/vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h>
 #include <sortnet/z_environment.h>
 
 #include <algorithm>
@@ -19,6 +17,8 @@
 #include <tabulate/table.hpp>
 #include <vector>
 
+#include "vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
+#include "BufferPool.h"
 #include "progress.h"
 #include "sortnet/comparator.h"
 #include "sortnet/sequence.h"
@@ -484,8 +484,8 @@ public:
 
     auto prune = [&](const auto& filename) -> uint64_t {
       auto* buffer = buffers.get();
-      auto begin = buffer->setsFirst.begin();
-      auto end = buffer->setsFirst.end();
+      auto begin = buffer->sets.begin();
+      auto end = buffer->sets.end();
 
       auto size = storage.Load(filename, layer, begin, end);
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -535,8 +535,8 @@ public:
   uint64_t pruneAcrossFiles(uint8_t layer) {
     auto prune = [&](const std::string& filename, auto begin, auto end) -> uint32_t {
       auto* buffer = buffers.get();
-      auto begin2 = buffer->setsFirst.begin();
-      auto end2 = buffer->setsFirst.end();
+      auto begin2 = buffer->sets.begin();
+      auto end2 = buffer->sets.end();
 
       auto size = storage.Load(filename, layer, begin2, end2);
 #if (RECORD_INTERNAL_METRICS == 1)
@@ -571,7 +571,7 @@ public:
 #endif
 
     auto* buffer = buffers.get();
-    auto& sets = buffer->setsFirst;
+    auto& sets = buffer->sets;
     std::vector<std::future<uint32_t>> results{};
     uint64_t pruned{0};
     for (std::size_t i{0}; i < filenames.size(); ++i) {

@@ -5,7 +5,7 @@
 #include <array>
 #include <bit>
 
-#include "sortnet/io.h"
+#include "../../../app/src/io.h"
 #include "sortnet/sequence.h"
 
 namespace sortnet::set {

@@ -8,8 +8,8 @@
 #include <map>
 #include <string>
 
+#include "io.h"
 #include "sortnet/concepts.h"
-#include "sortnet/io.h"
 #include "sortnet/json.h"
 #include "sortnet/z_environment.h"
 

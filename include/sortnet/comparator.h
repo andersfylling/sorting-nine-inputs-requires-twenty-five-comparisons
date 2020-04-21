@@ -1,11 +1,12 @@
 #pragma once
 
-#include <sortnet/io.h>
 #include <sortnet/sequence.h>
 #include <sortnet/z_environment.h>
 
 #include <array>
 #include <string>
+
+#include "../../app/src/io.h"
 
 namespace sortnet {
   class Comparator {

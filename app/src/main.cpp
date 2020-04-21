@@ -8,13 +8,13 @@
 #define RECORD_IO_TIME 0
 
 #include <sortnet/networks/Network.h>
-#include <sortnet/persistentStorage.h>
 #include <sortnet/sets/ListNaive.h>
 
 #include <cxxopts.hpp>
 #include <iostream>
 
 #include "GenerateAndPrune.h"
+#include "persistentStorage.h"
 
 constexpr uint8_t Threads{8};
 constexpr uint8_t N{8};
