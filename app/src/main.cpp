@@ -1,28 +1,43 @@
-#include <greeter.h>
+#define LEMMA_7 1
+#define RECORD_INTERNAL_METRICS 1
+#define PRINT_LAYER_SUMMARY 1
+#define PRINT_PROGRESS 1
+#define RECORD_ANALYSIS 1
+#define SAVE_METRICS 1
+#define PREFER_SAFETY 0
+#define RECORD_IO_TIME 0
+
+#include <sortnet/networks/Network.h>
+#include <sortnet/persistentStorage.h>
+#include <sortnet/sets/ListNaive.h>
 
 #include <cxxopts.hpp>
 #include <iostream>
-#include <string>
-#include <unordered_map>
 
-const std::unordered_map<std::string, greeter::LanguageCode> languages{
-    {"en", greeter::LanguageCode::EN},
-    {"de", greeter::LanguageCode::DE},
-    {"es", greeter::LanguageCode::ES},
-    {"fr", greeter::LanguageCode::FR},
-};
+#include "GenerateAndPrune.h"
+
+constexpr uint8_t Threads{8};
+constexpr uint8_t N{8};
+
+template <uint8_t N, uint8_t K = ::sortnet::networkSizeUpperBound<N>()>
+constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
+  using Set = ::sortnet::set::ListNaive<N, K>;
+  using Net = ::sortnet::network::Network<N, K>;
+  using Storage = ::sortnet::PersistentStorage<Net, Set, N, K>;
+
+  auto g = GenerateAndPrune<N, K, Threads - 1, Set, Net, Storage>{};
+  return g.run();
+}
 
 int main(int argc, char** argv) {
-  cxxopts::Options options(argv[0], "A program to welcome the world!");
-
-  std::string language;
-  std::string name;
+  cxxopts::Options options(argv[0],
+                           "Generate and prune approach for finding the smallest sized sorting "
+                           "network for a sequence of N elements");
 
   // clang-format off
   options.add_options()
     ("h,help", "Show help")
-    ("n,name", "Name to greet", cxxopts::value(name)->default_value("World"))
-    ("l,lang", "Language code to use", cxxopts::value(language)->default_value("en"))
+    ("info", "Project information")
   ;
   // clang-format on
 
@@ -31,16 +46,23 @@ int main(int argc, char** argv) {
   if (result["help"].as<bool>()) {
     std::cout << options.help() << std::endl;
     return 0;
+  } else if (result["info"].as<bool>()) {
+    std::cout << "Third part c++ implementation of the paper \"Sorting nine inputs requires "
+                 "twenty-five comparisons\"."
+              << std::endl
+              << std::endl;
+    std::cout
+        << "https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons"
+        << std::endl;
+    std::cout << "MIT License - Copyright (c) 2020 Anders Øen Fylling" << std::endl;
+    return 0;
   }
 
-  auto langIt = languages.find(language);
-  if (langIt == languages.end()) {
-    std::cout << "unknown language code: " << language << std::endl;
-    return 1;
-  }
+  std::ios::sync_with_stdio(false);
+  const auto m = metricsFor<N>();
 
-  greeter::Greeter greeter(name);
-  std::cout << greeter.greet(langIt->second) << std::endl;
+  std::cout << m.Seconds() << std::endl;
 
+  usleep(3000000);  // 3s
   return 0;
 }
