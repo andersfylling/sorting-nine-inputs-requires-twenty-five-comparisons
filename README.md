@@ -7,7 +7,7 @@
 # About
 This is a **third-party** implementation of the paper ["*Sorting nine inputs requires twenty-five comparisons*"](https://www.sciencedirect.com/science/article/pii/S0022000015001397) [1] in c++. It exists to make a reliable reference point for future projects that needs to measure the runtime reduction of their ideas/findings, with regards to [the minimum comparator network size problem](https://en.wikipedia.org/wiki/Sorting_network) [3].
 
-This project is considered feature complete as the core methods are implemented in a naive/simple manner of their prolog version. However, code design, naming, or anything that improves on readability are changes of interest. 
+This project is considered feature complete as the core methods are implemented in a naive/simple manner of their prolog version. However, code design, naming, or anything that improves readability are changes of interest. 
 
 ## Features
 
