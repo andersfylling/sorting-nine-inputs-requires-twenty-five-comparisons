@@ -20,6 +20,9 @@ jobs:
     - name: build
       run: cmake --build build --config Debug -j4
 
+    - name: version
+      run: gcc --version
+
     - name: test
       run: |
         cd build
