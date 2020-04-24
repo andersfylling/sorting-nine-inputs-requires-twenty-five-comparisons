@@ -15,8 +15,7 @@ This project is considered feature complete as the core methods are implemented 
 - Scalable memory usage
 - Minimal heap allocations
 - Test suite
-- A library
-- Easy to add and implement your own ideas
+- Components as a static library
 
 TODO: benchmark
 
