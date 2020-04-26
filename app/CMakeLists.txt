@@ -41,6 +41,19 @@ CPMAddPackage(
   SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..
 )
 
+# ---- Configure compile time c++ parameters ----
+
+if (NOT SORTNET_PARAM_N)
+    set(SORTNET_PARAM_N 0)
+endif()
+if (NOT SORTNET_PARAM_K)
+    set(SORTNET_PARAM_K 0)
+endif()
+if (NOT SORTNET_PARAM_THREADS)
+    set(SORTNET_PARAM_THREADS 0)
+endif()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/settings.h" "${CMAKE_CURRENT_SOURCE_DIR}/src/settings.h")
+
 # ---- Create standalone executable ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)

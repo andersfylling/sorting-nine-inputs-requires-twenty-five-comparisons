@@ -59,23 +59,23 @@ public:
 
   // serialize
   void write(std::ostream &f) const {
-    binary_write(f, netID);
-    binary_write(f, ones);
-    binary_write(f, onesCount);
-    binary_write(f, zeros);
-    binary_write(f, zerosCount);
-    binary_write(f, sizes);
+    ::sortnet::binary_write(f, netID);
+    ::sortnet::binary_write(f, ones);
+    ::sortnet::binary_write(f, onesCount);
+    ::sortnet::binary_write(f, zeros);
+    ::sortnet::binary_write(f, zerosCount);
+    ::sortnet::binary_write(f, sizes);
   }
 
   void read(std::istream &f) {
     marked = false;
 
-    binary_read(f, netID);
-    binary_read(f, ones);
-    binary_read(f, onesCount);
-    binary_read(f, zeros);
-    binary_read(f, zerosCount);
-    binary_read(f, sizes);
+    ::sortnet::binary_read(f, netID);
+    ::sortnet::binary_read(f, ones);
+    ::sortnet::binary_read(f, onesCount);
+    ::sortnet::binary_read(f, zeros);
+    ::sortnet::binary_read(f, zerosCount);
+    ::sortnet::binary_read(f, sizes);
   }
 };
 

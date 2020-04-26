@@ -11,11 +11,11 @@ namespace sortnet {
 namespace network {
 template <uint8_t N, uint8_t K> class Network {
 private:
-  std::vector<Comparator> comparators{};
+  std::vector<::sortnet::Comparator> comparators{};
 
-  constexpr void addUnsafe(const Comparator c) { comparators.push_back(c); }
+  constexpr void addUnsafe(const ::sortnet::Comparator c) { comparators.push_back(c); }
 
-  constexpr void addSafe(const Comparator c) {
+  constexpr void addSafe(const ::sortnet::Comparator c) {
     if (comparators.size() == K) {
       throw std::logic_error("this network can not fit any more comparators");
     }
@@ -54,7 +54,7 @@ public:
     return comparators.back();
   }
 
-  constexpr void push_back(const Comparator c) {
+  constexpr void push_back(const ::sortnet::Comparator c) {
 #if (PREFER_SAFETY == 1)
     addSafe(c);
 #else
@@ -70,8 +70,8 @@ public:
   };
 
   // iterators for the comparators
-  using const_iterator = typename std::vector<Comparator>::const_iterator;
-  using iterator = typename std::vector<Comparator>::iterator;
+  using const_iterator = typename std::vector<::sortnet::Comparator>::const_iterator;
+  using iterator = typename std::vector<::sortnet::Comparator>::iterator;
   iterator begin() { return comparators.begin(); }
   [[nodiscard]] const_iterator cbegin() const noexcept { return comparators.cbegin(); }
   iterator end() { return comparators.end(); }
@@ -79,27 +79,27 @@ public:
 
   // serialize network
   void write(std::ostream &stream) const {
-    binary_write(stream, id);
+    ::sortnet::binary_write(stream, id);
 
     std::size_t _size{comparators.size()};
-    binary_write(stream, _size);
+    ::sortnet::binary_write(stream, _size);
 
     for (std::size_t i = 0; i < _size; i++) {
-      const Comparator c{comparators.at(i)};
-      binary_write(stream, c);
+      const ::sortnet::Comparator c{comparators.at(i)};
+      ::sortnet::binary_write(stream, c);
     }
   }
 
   void read(std::istream &stream) {
     clear();
 
-    binary_read(stream, id);
+    ::sortnet::binary_read(stream, id);
 
     std::size_t _size{0};
-    binary_read(stream, _size);
+    ::sortnet::binary_read(stream, _size);
 
     for (std::size_t i{0}; i < _size; ++i) {
-      Comparator c{0, 0};
+      ::sortnet::Comparator c{0, 0};
       c.read(stream);
 
       push_back(c);

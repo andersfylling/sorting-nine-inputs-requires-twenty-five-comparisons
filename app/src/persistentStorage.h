@@ -94,7 +94,7 @@ public:
 
     // number of networks/sets
     const int32_t distance{static_cast<int32_t>(std::distance(begin, end))};
-    binary_write(f, distance);
+    ::sortnet::binary_write(f, distance);
 
     // the actual content
     for (; begin != end; ++begin) {
@@ -131,7 +131,7 @@ public:
     f.unsetf(std::ios_base::skipws);
 
     int32_t limit{};
-    binary_read(f, limit);
+    ::sortnet::binary_read(f, limit);
 
     int32_t counter{0};
     for (; (it != end && counter < limit); ++it) {  //&& (layer <= 2 && counter < 3)

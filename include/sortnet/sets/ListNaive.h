@@ -47,16 +47,16 @@ public:
     return std::find(seqs.cbegin(), seqs.cend(), s) != seqs.cend();
   }
 
-  [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k, const sequence_t s) const {
+  [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k, const ::sortnet::sequence_t s) const {
     return contains(s);
   }
 
   // WARNING: you can not insert a binary sequence with N activated bits,
   // as this causes undefined behaviour.
-  constexpr void insert(const int8_t k, const sequence_t s) {
+  constexpr void insert(const int8_t k, const ::sortnet::sequence_t s) {
 #if (PREFER_SAFETY == 1)
-    constexpr sequence_t mask{sequence::binary::mask<N>};
-    const sequence_t filtered{s & mask};
+    constexpr ::sortnet::sequence_t mask{::sortnet::sequence::binary::mask<N>};
+    const ::sortnet::sequence_t filtered{s & mask};
     if (filtered == mask || filtered == 0) {
       return;
     }
@@ -70,7 +70,7 @@ public:
   }
 
   bool subsumes(const ListNaive &other) const {
-    for (const sequence_t s : seqs) {
+    for (const ::sortnet::sequence_t s : seqs) {
       if (std::find(other.cbegin(), other.cend(), s) == other.cend()) {
         return false;
       }
@@ -82,7 +82,7 @@ public:
   constexpr void computeMeta() { metadata.compute(); }
 
   // iterator
-  using const_iterator = typename std::list<sequence_t>::const_iterator;
+  using const_iterator = typename std::list<::sortnet::sequence_t>::const_iterator;
   [[nodiscard]] const_iterator begin() const noexcept { return seqs.cbegin(); }
   [[nodiscard]] const_iterator cbegin() const noexcept { return seqs.cbegin(); }
   [[nodiscard]] const_iterator end() const noexcept { return seqs.cend(); }
@@ -93,10 +93,10 @@ public:
     metadata.write(f);
 
     int32_t _size{size()};
-    binary_write(f, _size);
+    ::sortnet::binary_write(f, _size);
 
     for (const sequence_t s : seqs) {
-      binary_write(f, s);
+      ::sortnet::binary_write(f, s);
     }
   }
 
@@ -105,11 +105,11 @@ public:
     metadata.read(f);
 
     int32_t _size{0};
-    binary_read(f, _size);
+    ::sortnet::binary_read(f, _size);
 
     for (int32_t i{0}; i < _size; ++i) {
       sequence_t s{0};
-      binary_read(f, s);
+      ::sortnet::binary_read(f, s);
       seqs.push_back(s);
     }
   }

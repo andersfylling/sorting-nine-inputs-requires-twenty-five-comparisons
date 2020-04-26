@@ -52,7 +52,7 @@ private:
 
     // cleanup
     net.clear();
-    set.reset();
+    set.clear();
 
     // create relationship
     net.id = 1;

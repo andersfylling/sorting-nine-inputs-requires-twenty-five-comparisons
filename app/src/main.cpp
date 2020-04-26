@@ -4,7 +4,7 @@
 #define PRINT_PROGRESS 1
 #define RECORD_ANALYSIS 1
 #define SAVE_METRICS 1
-#define PREFER_SAFETY 0
+#define PREFER_SAFETY 1
 #define RECORD_IO_TIME 0
 
 #include <sortnet/networks/Network.h>
@@ -16,18 +16,11 @@
 #include "GenerateAndPrune.h"
 #include "persistentStorage.h"
 
-constexpr uint8_t Threads{8};
-constexpr uint8_t N{8};
+#include "settings.h"
 
-template <uint8_t N, uint8_t K = ::sortnet::networkSizeUpperBound<N>()>
-constexpr ::sortnet::MetricsLayered<N, K> metricsFor() {
-  using Set = ::sortnet::set::ListNaive<N, K>;
-  using Net = ::sortnet::network::Network<N, K>;
-  using Storage = PersistentStorage<Net, Set, N, K>;
-
-  auto g = GenerateAndPrune<N, K, Threads - 1, Set, Net, Storage>{};
-  return g.run();
-}
+constexpr uint8_t N{PARAM_N > 0 ? PARAM_N : 7};
+constexpr uint8_t K{PARAM_K > 0 ? PARAM_K : ::sortnet::networkSizeUpperBound<N>()};
+constexpr uint8_t Threads{PARAM_THREADS > 0 ? PARAM_THREADS : 2};
 
 int main(int argc, char** argv) {
   cxxopts::Options options(argv[0],
@@ -59,10 +52,13 @@ int main(int argc, char** argv) {
   }
 
   std::ios::sync_with_stdio(false);
-  const auto m = metricsFor<N>();
+  using Set = ::sortnet::set::ListNaive<N, K>;
+  using Net = ::sortnet::network::Network<N, K>;
+  using Storage = PersistentStorage<Net, Set, N, K>;
 
-  std::cout << m.Seconds() << std::endl;
+  auto g = GenerateAndPrune<N, K, Threads - 1, Set, Net, Storage>{};
+  const auto m = g.run();
 
-  usleep(3000000);  // 3s
+  usleep(500000);  // 0.5s
   return 0;
 }
