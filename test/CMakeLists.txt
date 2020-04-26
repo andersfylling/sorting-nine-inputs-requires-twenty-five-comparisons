@@ -65,6 +65,6 @@ doctest_discover_tests(SortnetTests)
 # ---- code coverage ----
 
 if (ENABLE_TEST_COVERAGE)
-  target_compile_options(Sortnet PRIVATE -O0 -g -fprofile-arcs -ftest-coverage --coverage)
-  target_link_options(Sortnet PUBLIC "--coverage")
+  target_compile_options(Sortnet PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(Sortnet PUBLIC -fprofile-arcs -ftest-coverage)
 endif()

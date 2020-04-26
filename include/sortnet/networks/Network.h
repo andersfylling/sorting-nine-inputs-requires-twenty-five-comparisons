@@ -41,6 +41,8 @@ public:
 
   [[nodiscard]] constexpr std::size_t size() const { return comparators.size(); }
 
+  [[nodiscard]] constexpr bool empty() const { return comparators.empty(); }
+
   constexpr void clear() {
     id = 0;
     comparators.clear();
