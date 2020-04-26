@@ -17,7 +17,26 @@ This project is considered feature complete as the core methods are implemented 
 - Test suite
 - Components as a static library
 
-TODO: benchmark
+## Running for different variables
+
+The variables N, K, Threads can be set before compiling the project with the following cmake params:
+ - SORTNET_PARAM_N
+ - SORTNET_PARAM_K
+ - SORTNET_PARAM_THREADS
+ 
+#### Example
+
+```CMake
+cmake \
+ -Happ \
+ -Bbuild/app \
+ -DCMAKE_BUILD_TYPE=Release \
+ -DSORTNET_PARAM_N=9
+```
+
+## Benchmarks
+
+_TODO_
 
 ## Code flow
 The goal is to find a network with size K that has no smaller network able to sort a sequence of N elements. In order to do so a weak proof algorithm must be implemented that proves no smaller network exist by exploring all configurations. This is also known as brute forcing. As such the program starts with a network of zero comparators and derives all possible configurations using a [breadth first search](https://en.wikipedia.org/wiki/Breadth-first_search) [4] until a sorting network is discovered. Because every network configuration of size K is explored step wise, we know that there is no network of size K-1 that can sort a sequence of N elements - which ultimately becomes the proof that the discovered sorting network is in fact the smallest size.  
