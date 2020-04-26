@@ -15,7 +15,6 @@
 
 #include "GenerateAndPrune.h"
 #include "persistentStorage.h"
-
 #include "settings.h"
 
 constexpr uint8_t N{PARAM_N > 0 ? PARAM_N : 7};

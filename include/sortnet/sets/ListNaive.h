@@ -1,14 +1,13 @@
 #pragma once
 
-#include <algorithm>
-#include <list>
-
-#include <sortnet/sets/Metadata.h>
 #include <sortnet/io.h>
 #include <sortnet/permutation.h>
 #include <sortnet/sequence.h>
-
+#include <sortnet/sets/Metadata.h>
 #include <sortnet/z_environment.h>
+
+#include <algorithm>
+#include <list>
 
 namespace sortnet::set {
 template <uint8_t N, uint8_t K> class ListNaive {
@@ -47,7 +46,8 @@ public:
     return std::find(seqs.cbegin(), seqs.cend(), s) != seqs.cend();
   }
 
-  [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k, const ::sortnet::sequence_t s) const {
+  [[nodiscard]] constexpr bool contains([[maybe_unused]] const int8_t k,
+                                        const ::sortnet::sequence_t s) const {
     return contains(s);
   }
 
