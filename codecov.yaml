@@ -1,6 +1,7 @@
 
 ignore:
   - "test"
+  - "app/src/vendors"
 
 comment:
   require_changes: true
