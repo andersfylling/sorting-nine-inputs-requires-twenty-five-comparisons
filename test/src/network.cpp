@@ -87,3 +87,28 @@ TEST_CASE("network operations") {
   // back should return a empty comparator
   REQUIRE(net.back() == ::sortnet::Comparator{0, 0});
 }
+
+TEST_CASE("serialization") {
+  constexpr uint8_t N = 4;
+  constexpr uint8_t K = 5;
+  using net_t = ::sortnet::network::Network<N, K>;
+
+  net_t net{};
+  net.push_back(comp<N>(0, 1));
+  net.push_back(comp<N>(1, 2));
+  net.push_back(comp<N>(0, 3));
+
+  net_t backup(net);
+  REQUIRE(backup == net);
+
+  net_t net2{};
+  REQUIRE(!(net == net2));  // ambiguous?
+
+  std::stringstream ss{};
+  net.write(ss);
+  net.clear();
+  REQUIRE(net == net2);
+
+  net.read(ss);
+  REQUIRE(net == backup);
+}

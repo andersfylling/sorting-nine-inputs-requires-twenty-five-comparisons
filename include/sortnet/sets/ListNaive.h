@@ -27,7 +27,7 @@ public:
     std::copy(rhs.seqs.cbegin(), rhs.seqs.cend(), std::back_inserter(seqs));
     return *this;
   };
-  constexpr bool operator==(const ListNaive &rhs) {
+  constexpr bool operator==(const ListNaive &rhs) const {
     if (seqs.size() != rhs.seqs.size()) {
       return false;
     }
@@ -92,7 +92,7 @@ public:
   void write(std::ostream &f) const {
     metadata.write(f);
 
-    int32_t _size{size()};
+    int32_t _size{static_cast<int32_t>(size())};
     ::sortnet::binary_write(f, _size);
 
     for (const sequence_t s : seqs) {

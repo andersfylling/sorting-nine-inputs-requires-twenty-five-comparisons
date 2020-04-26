@@ -21,6 +21,8 @@ constexpr uint64_t factorial(uint64_t n) {
   return n * factorial(n - 1);
 }
 
+constexpr uint8_t k(const sequence_t s) { return std::popcount(s) - 1; }
+
 template <uint8_t N> constexpr uint8_t networkSizeUpperBound() {
   static_assert(N > 1, "N must be above 1");
   static_assert(N < 17, "N can not be higher than 17");

@@ -184,3 +184,32 @@ TEST_CASE("Subsuming check 2 - random networks") {
     REQUIRE(CaOutputs.subsumes(CbOutputs));
   }
 }
+
+TEST_CASE("serialization") {
+  constexpr uint8_t N = 4;
+  constexpr uint8_t K = 5;
+  using set_t = ::sortnet::set::ListNaive<N, K>;
+
+  set_t set1{};
+  auto insert = [&](const auto s) { set1.insert(::sortnet::k(s), s); };
+
+  insert(0b1101);
+  insert(0b1001);
+  insert(0b1100);
+  insert(0b1000);
+  insert(0b0101);
+  insert(0b0001);
+  set_t set1Backup(set1);
+  REQUIRE(set1Backup == set1);
+
+  set_t set2{};
+  REQUIRE(!(set1 == set2));  // ambiguous?
+
+  std::stringstream ss{};
+  set1.write(ss);
+  set1.clear();
+  REQUIRE(set1 == set2);
+
+  set1.read(ss);
+  REQUIRE(set1 == set1Backup);
+}
