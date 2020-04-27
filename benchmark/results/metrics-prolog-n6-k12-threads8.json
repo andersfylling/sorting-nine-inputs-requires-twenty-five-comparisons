@@ -1,0 +1,155 @@
+{
+  "cores": 7,
+  "date": "-",
+  "duration": 0.0,
+  "duration_type": "seconds",
+  "epoch": 0,
+  "file_limit": 5000,
+  "k": 12,
+  "layers": [
+    {
+      "duration": {
+        "generating": {
+          "total": 0.0
+        },
+        "pruning": {
+          "total": 0.0
+        }
+      },
+      "layer": 0
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.016
+        },
+        "pruning": {
+          "total": 0.004
+        }
+      },
+      "layer": 1
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.006
+        },
+        "pruning": {
+          "total": 0.007
+        }
+      },
+      "layer": 2
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.01
+        },
+        "pruning": {
+          "total": 0.01
+        }
+      },
+      "layer": 3
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.02
+        },
+        "pruning": {
+          "total": 0.027
+        }
+      },
+      "layer": 4
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.036
+        },
+        "pruning": {
+          "total": 0.064
+        }
+      },
+      "layer": 5
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.063
+        },
+        "pruning": {
+          "total": 0.143
+        }
+      },
+      "layer": 6
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.054
+        },
+        "pruning": {
+          "total": 0.163
+        }
+      },
+      "layer": 7
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.06
+        },
+        "pruning": {
+          "total": 0.123
+        }
+      },
+      "layer": 8
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.006
+        },
+        "pruning": {
+          "total": 0.07
+        }
+      },
+      "layer": 9
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.017
+        },
+        "pruning": {
+          "total": 0.023
+        }
+      },
+      "layer": 10
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.003
+        },
+        "pruning": {
+          "total": 0.004
+        }
+      },
+      "layer": 11
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.003
+        },
+        "pruning": {
+          "total": 0.0
+        }
+      },
+      "layer": 12
+    }
+  ],
+  "n": 6
+}

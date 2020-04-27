@@ -1,0 +1,992 @@
+{
+  "cores": 7,
+  "date": "Mon Apr 27 00:38:32 2020\n",
+  "duration": 78.75269100000001,
+  "duration_type": "seconds",
+  "epoch": 1587940712,
+  "file_limit": 5000,
+  "k": 19,
+  "layers": [
+    {
+      "duration": {
+        "generating": {
+          "total": 0.0
+        },
+        "pruning": {
+          "across_clusters": 0.0,
+          "total": 0.0,
+          "within_cluster": 0.0,
+          "within_file": 0.0
+        }
+      },
+      "file_reads": 0,
+      "file_writes": 1,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 0
+      },
+      "layer": 0,
+      "permutations": 0,
+      "pruned": {
+        "across_clusters": 0,
+        "total": 0,
+        "within_cluster": 0,
+        "within_file": 0
+      },
+      "redundant_comparators": 0,
+      "redundant_comparators_quick": 0,
+      "st1": {
+        "accepted": 0,
+        "called": 0,
+        "rejected": 0
+      },
+      "st2": {
+        "accepted": 0,
+        "called": 0,
+        "rejected": 0
+      },
+      "st3": {
+        "accepted": 0,
+        "called": 0,
+        "rejected": 0
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 0
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.00805
+        },
+        "pruning": {
+          "across_clusters": 8.1e-05,
+          "total": 0.001431,
+          "within_cluster": 0.0,
+          "within_file": 0.00135
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 27
+      },
+      "layer": 1,
+      "permutations": 27,
+      "pruned": {
+        "across_clusters": 27,
+        "total": 27,
+        "within_cluster": 0,
+        "within_file": 27
+      },
+      "redundant_comparators": 0,
+      "redundant_comparators_quick": 0,
+      "st1": {
+        "accepted": 27,
+        "called": 27,
+        "rejected": 0
+      },
+      "st2": {
+        "accepted": 27,
+        "called": 27,
+        "rejected": 0
+      },
+      "st3": {
+        "accepted": 27,
+        "called": 27,
+        "rejected": 0
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 27
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.001617
+        },
+        "pruning": {
+          "across_clusters": 8.6e-05,
+          "total": 0.000763,
+          "within_cluster": 0.0,
+          "within_file": 0.000677
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 24
+      },
+      "layer": 2,
+      "permutations": 24,
+      "pruned": {
+        "across_clusters": 24,
+        "total": 24,
+        "within_cluster": 0,
+        "within_file": 24
+      },
+      "redundant_comparators": 0,
+      "redundant_comparators_quick": 1,
+      "st1": {
+        "accepted": 66,
+        "called": 96,
+        "rejected": 30
+      },
+      "st2": {
+        "accepted": 54,
+        "called": 66,
+        "rejected": 12
+      },
+      "st3": {
+        "accepted": 24,
+        "called": 54,
+        "rejected": 30
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 24
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.002489
+        },
+        "pruning": {
+          "across_clusters": 0.000137,
+          "total": 0.002801,
+          "within_cluster": 0.0,
+          "within_file": 0.002664
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 71
+      },
+      "layer": 3,
+      "permutations": 167,
+      "pruned": {
+        "across_clusters": 71,
+        "total": 71,
+        "within_cluster": 0,
+        "within_file": 71
+      },
+      "redundant_comparators": 3,
+      "redundant_comparators_quick": 3,
+      "st1": {
+        "accepted": 351,
+        "called": 533,
+        "rejected": 182
+      },
+      "st2": {
+        "accepted": 245,
+        "called": 351,
+        "rejected": 106
+      },
+      "st3": {
+        "accepted": 115,
+        "called": 245,
+        "rejected": 130
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 71
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.003798
+        },
+        "pruning": {
+          "across_clusters": 0.000192,
+          "total": 0.004125,
+          "within_cluster": 0.0,
+          "within_file": 0.003933
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 155
+      },
+      "layer": 4,
+      "permutations": 893,
+      "pruned": {
+        "across_clusters": 155,
+        "total": 155,
+        "within_cluster": 0,
+        "within_file": 155
+      },
+      "redundant_comparators": 14,
+      "redundant_comparators_quick": 7,
+      "st1": {
+        "accepted": 2030,
+        "called": 3355,
+        "rejected": 1325
+      },
+      "st2": {
+        "accepted": 1054,
+        "called": 2030,
+        "rejected": 976
+      },
+      "st3": {
+        "accepted": 260,
+        "called": 1054,
+        "rejected": 794
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 155
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.007386
+        },
+        "pruning": {
+          "across_clusters": 0.000342,
+          "total": 0.011081,
+          "within_cluster": 0.0,
+          "within_file": 0.010739
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 422
+      },
+      "layer": 5,
+      "permutations": 4943,
+      "pruned": {
+        "across_clusters": 422,
+        "total": 422,
+        "within_cluster": 0,
+        "within_file": 422
+      },
+      "redundant_comparators": 61,
+      "redundant_comparators_quick": 20,
+      "st1": {
+        "accepted": 16327,
+        "called": 28562,
+        "rejected": 12235
+      },
+      "st2": {
+        "accepted": 6889,
+        "called": 16327,
+        "rejected": 9438
+      },
+      "st3": {
+        "accepted": 1236,
+        "called": 6889,
+        "rejected": 5653
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 422
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.015466
+        },
+        "pruning": {
+          "across_clusters": 0.000757,
+          "total": 0.033723,
+          "within_cluster": 0.0,
+          "within_file": 0.032966
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 1117
+      },
+      "layer": 6,
+      "permutations": 16057,
+      "pruned": {
+        "across_clusters": 1117,
+        "total": 1117,
+        "within_cluster": 0,
+        "within_file": 1117
+      },
+      "redundant_comparators": 233,
+      "redundant_comparators_quick": 57,
+      "st1": {
+        "accepted": 141076,
+        "called": 254042,
+        "rejected": 112966
+      },
+      "st2": {
+        "accepted": 41334,
+        "called": 141076,
+        "rejected": 99742
+      },
+      "st3": {
+        "accepted": 5327,
+        "called": 41334,
+        "rejected": 36007
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 1117
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.039454
+        },
+        "pruning": {
+          "across_clusters": 0.002244,
+          "total": 0.153712,
+          "within_cluster": 0.0,
+          "within_file": 0.151468
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 3484
+      },
+      "layer": 7,
+      "permutations": 66933,
+      "pruned": {
+        "across_clusters": 3484,
+        "total": 3484,
+        "within_cluster": 0,
+        "within_file": 3484
+      },
+      "redundant_comparators": 971,
+      "redundant_comparators_quick": 189,
+      "st1": {
+        "accepted": 1474030,
+        "called": 2701330,
+        "rejected": 1227300
+      },
+      "st2": {
+        "accepted": 302042,
+        "called": 1474030,
+        "rejected": 1171988
+      },
+      "st3": {
+        "accepted": 29253,
+        "called": 302042,
+        "rejected": 272789
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 3484
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.0978
+        },
+        "pruning": {
+          "across_clusters": 0.142066,
+          "total": 0.472518,
+          "within_cluster": 0.0,
+          "within_file": 0.330452
+        }
+      },
+      "file_reads": 14,
+      "file_writes": 15,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 11390
+      },
+      "layer": 8,
+      "permutations": 328787,
+      "pruned": {
+        "across_clusters": 11390,
+        "total": 11390,
+        "within_cluster": 0,
+        "within_file": 9372
+      },
+      "redundant_comparators": 4018,
+      "redundant_comparators_quick": 648,
+      "st1": {
+        "accepted": 11377935,
+        "called": 20988829,
+        "rejected": 9610894
+      },
+      "st2": {
+        "accepted": 1675231,
+        "called": 11377935,
+        "rejected": 9702704
+      },
+      "st3": {
+        "accepted": 150597,
+        "called": 1675231,
+        "rejected": 1524634
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 11388
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.243997
+        },
+        "pruning": {
+          "across_clusters": 1.0161,
+          "total": 1.936573,
+          "within_cluster": 0.0,
+          "within_file": 0.920473
+        }
+      },
+      "file_reads": 96,
+      "file_writes": 95,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 35371
+      },
+      "layer": 9,
+      "permutations": 1293527,
+      "pruned": {
+        "across_clusters": 35371,
+        "total": 35371,
+        "within_cluster": 0,
+        "within_file": 25069
+      },
+      "redundant_comparators": 15302,
+      "redundant_comparators_quick": 2088,
+      "st1": {
+        "accepted": 36203864,
+        "called": 59661381,
+        "rejected": 23457517
+      },
+      "st2": {
+        "accepted": 6806860,
+        "called": 36217474,
+        "rejected": 29410614
+      },
+      "st3": {
+        "accepted": 800967,
+        "called": 6806860,
+        "rejected": 6005893
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 35358
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.576539
+        },
+        "pruning": {
+          "across_clusters": 5.345706,
+          "total": 7.5938680000000005,
+          "within_cluster": 0.0,
+          "within_file": 2.248162
+        }
+      },
+      "file_reads": 524,
+      "file_writes": 507,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 93674
+      },
+      "layer": 10,
+      "permutations": 4037142,
+      "pruned": {
+        "across_clusters": 93674,
+        "total": 93674,
+        "within_cluster": 0,
+        "within_file": 59037
+      },
+      "redundant_comparators": 48638,
+      "redundant_comparators_quick": 5703,
+      "st1": {
+        "accepted": 157691095,
+        "called": 247596466,
+        "rejected": 89905371
+      },
+      "st2": {
+        "accepted": 24781979,
+        "called": 157691095,
+        "rejected": 132909116
+      },
+      "st3": {
+        "accepted": 3060475,
+        "called": 24781979,
+        "rejected": 21721504
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 93645
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 1.020479
+        },
+        "pruning": {
+          "across_clusters": 20.433935,
+          "total": 26.170828,
+          "within_cluster": 0.0,
+          "within_file": 5.736893
+        }
+      },
+      "file_reads": 1766,
+      "file_writes": 1694,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 184208
+      },
+      "layer": 11,
+      "permutations": 7763739,
+      "pruned": {
+        "across_clusters": 184208,
+        "total": 184208,
+        "within_cluster": 0,
+        "within_file": 112148
+      },
+      "redundant_comparators": 114760,
+      "redundant_comparators_quick": 11669,
+      "st1": {
+        "accepted": 325179407,
+        "called": 476643241,
+        "rejected": 151463834
+      },
+      "st2": {
+        "accepted": 49628745,
+        "called": 325179407,
+        "rejected": 275550662
+      },
+      "st3": {
+        "accepted": 6719268,
+        "called": 49628745,
+        "rejected": 42909477
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 184163
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 1.188492
+        },
+        "pruning": {
+          "across_clusters": 21.874129,
+          "total": 28.518363,
+          "within_cluster": 0.0,
+          "within_file": 6.644234
+        }
+      },
+      "file_reads": 2734,
+      "file_writes": 2655,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 239938
+      },
+      "layer": 12,
+      "permutations": 7732978,
+      "pruned": {
+        "across_clusters": 239938,
+        "total": 239938,
+        "within_cluster": 0,
+        "within_file": 148269
+      },
+      "redundant_comparators": 181322,
+      "redundant_comparators_quick": 16095,
+      "st1": {
+        "accepted": 353316663,
+        "called": 501870179,
+        "rejected": 148553516
+      },
+      "st2": {
+        "accepted": 50947008,
+        "called": 353316663,
+        "rejected": 302369655
+      },
+      "st3": {
+        "accepted": 8096854,
+        "called": 50947008,
+        "rejected": 42850154
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 239885
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.828601
+        },
+        "pruning": {
+          "across_clusters": 5.099508,
+          "total": 7.381381,
+          "within_cluster": 0.0,
+          "within_file": 2.281873
+        }
+      },
+      "file_reads": 1584,
+      "file_writes": 1497,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 181814
+      },
+      "layer": 13,
+      "permutations": 3632571,
+      "pruned": {
+        "across_clusters": 181814,
+        "total": 181814,
+        "within_cluster": 0,
+        "within_file": 118982
+      },
+      "redundant_comparators": 170746,
+      "redundant_comparators_quick": 13305,
+      "st1": {
+        "accepted": 249455169,
+        "called": 412528923,
+        "rejected": 163073754
+      },
+      "st2": {
+        "accepted": 26508565,
+        "called": 249455169,
+        "rejected": 222946604
+      },
+      "st3": {
+        "accepted": 4813138,
+        "called": 26508565,
+        "rejected": 21695427
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 181691
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.36227
+        },
+        "pruning": {
+          "across_clusters": 0.859202,
+          "total": 1.6627429999999999,
+          "within_cluster": 0.0,
+          "within_file": 0.803541
+        }
+      },
+      "file_reads": 382,
+      "file_writes": 318,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 81155
+      },
+      "layer": 14,
+      "permutations": 932155,
+      "pruned": {
+        "across_clusters": 81155,
+        "total": 81155,
+        "within_cluster": 0,
+        "within_file": 59577
+      },
+      "redundant_comparators": 96854,
+      "redundant_comparators_quick": 6675,
+      "st1": {
+        "accepted": 52695273,
+        "called": 86749977,
+        "rejected": 34054704
+      },
+      "st2": {
+        "accepted": 5368921,
+        "called": 52695273,
+        "rejected": 47326352
+      },
+      "st3": {
+        "accepted": 1421606,
+        "called": 5368921,
+        "rejected": 3947315
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 81091
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.113755
+        },
+        "pruning": {
+          "across_clusters": 0.068794,
+          "total": 0.228289,
+          "within_cluster": 0.0,
+          "within_file": 0.159495
+        }
+      },
+      "file_reads": 64,
+      "file_writes": 35,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 23071
+      },
+      "layer": 15,
+      "permutations": 138436,
+      "pruned": {
+        "across_clusters": 23071,
+        "total": 23071,
+        "within_cluster": 0,
+        "within_file": 20106
+      },
+      "redundant_comparators": 36258,
+      "redundant_comparators_quick": 2216,
+      "st1": {
+        "accepted": 8458149,
+        "called": 13633894,
+        "rejected": 5175745
+      },
+      "st2": {
+        "accepted": 554682,
+        "called": 8458149,
+        "rejected": 7903467
+      },
+      "st3": {
+        "accepted": 235903,
+        "called": 554778,
+        "rejected": 318875
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 23039
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.026241
+        },
+        "pruning": {
+          "across_clusters": 0.000225,
+          "total": 0.033774000000000005,
+          "within_cluster": 0.0,
+          "within_file": 0.033549
+        }
+      },
+      "file_reads": 12,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 4249
+      },
+      "layer": 16,
+      "permutations": 11339,
+      "pruned": {
+        "across_clusters": 4249,
+        "total": 4249,
+        "within_cluster": 0,
+        "within_file": 4249
+      },
+      "redundant_comparators": 9255,
+      "redundant_comparators_quick": 503,
+      "st1": {
+        "accepted": 666829,
+        "called": 1050227,
+        "rejected": 383398
+      },
+      "st2": {
+        "accepted": 31031,
+        "called": 666829,
+        "rejected": 635798
+      },
+      "st3": {
+        "accepted": 23001,
+        "called": 31031,
+        "rejected": 8030
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 4249
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.004275
+        },
+        "pruning": {
+          "across_clusters": 0.000114,
+          "total": 0.002356,
+          "within_cluster": 0.0,
+          "within_file": 0.002242
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 464
+      },
+      "layer": 17,
+      "permutations": 698,
+      "pruned": {
+        "across_clusters": 464,
+        "total": 464,
+        "within_cluster": 0,
+        "within_file": 464
+      },
+      "redundant_comparators": 1597,
+      "redundant_comparators_quick": 77,
+      "st1": {
+        "accepted": 16533,
+        "called": 24951,
+        "rejected": 8418
+      },
+      "st2": {
+        "accepted": 1078,
+        "called": 16533,
+        "rejected": 15455
+      },
+      "st3": {
+        "accepted": 980,
+        "called": 1078,
+        "rejected": 98
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 464
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.000767
+        },
+        "pruning": {
+          "across_clusters": 5.9e-05,
+          "total": 0.002123,
+          "within_cluster": 0.0,
+          "within_file": 0.002064
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 46
+      },
+      "layer": 18,
+      "permutations": 46,
+      "pruned": {
+        "across_clusters": 46,
+        "total": 46,
+        "within_cluster": 0,
+        "within_file": 46
+      },
+      "redundant_comparators": 431,
+      "redundant_comparators_quick": 18,
+      "st1": {
+        "accepted": 394,
+        "called": 506,
+        "rejected": 112
+      },
+      "st2": {
+        "accepted": 48,
+        "called": 394,
+        "rejected": 346
+      },
+      "st3": {
+        "accepted": 48,
+        "called": 48,
+        "rejected": 0
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 46
+    },
+    {
+      "duration": {
+        "generating": {
+          "total": 0.000506
+        },
+        "pruning": {
+          "across_clusters": 3.5e-05,
+          "total": 0.000257,
+          "within_cluster": 0.0,
+          "within_file": 0.000222
+        }
+      },
+      "file_reads": 4,
+      "file_writes": 3,
+      "fragmenting": {
+        "after": 0,
+        "before": 0
+      },
+      "generated": {
+        "total": 14
+      },
+      "layer": 19,
+      "permutations": 14,
+      "pruned": {
+        "across_clusters": 14,
+        "total": 14,
+        "within_cluster": 0,
+        "within_file": 14
+      },
+      "redundant_comparators": 228,
+      "redundant_comparators_quick": 9,
+      "st1": {
+        "accepted": 26,
+        "called": 29,
+        "rejected": 3
+      },
+      "st2": {
+        "accepted": 14,
+        "called": 26,
+        "rejected": 12
+      },
+      "st3": {
+        "accepted": 14,
+        "called": 14,
+        "rejected": 0
+      },
+      "subsumes_fallback": 0,
+      "subsumptions": 14
+    }
+  ],
+  "n": 8
+}

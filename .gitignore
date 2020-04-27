@@ -8,3 +8,5 @@ app/cmake-build-debug/*
 app/cmake-build-release/*
 test/cmake-build-debug/*
 test/cmake-build-release/*
+app/src/settings.h
+benchmark/.idea
