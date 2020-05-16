@@ -9,6 +9,8 @@ This is a **third-party** implementation of the paper ["*Sorting nine inputs req
 
 This project is considered feature complete as the core methods are implemented in a naive/simple manner of their prolog version. However, code design, naming, or anything that improves readability are changes of interest. 
 
+> You must use gcc10 or clang10 to compile this
+
 ## Features
 
 - Multi-threading
