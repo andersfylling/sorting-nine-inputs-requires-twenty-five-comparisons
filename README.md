@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/branch/master/graph/badge.svg)](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons)
 
 # About
-This is a **third-party** implementation of the paper ["*Sorting nine inputs requires twenty-five comparisons*"](https://www.sciencedirect.com/science/article/pii/S0022000015001397) [1] in c++. It exists to make a reliable reference point for future projects that needs to measure the runtime reduction of their ideas/findings, with regards to [the minimum comparator network size problem](https://en.wikipedia.org/wiki/Sorting_network) [3].
+This is a **third-party** implementation of the paper ["*Sorting nine inputs requires twenty-five comparisons*"](https://www.sciencedirect.com/science/article/pii/S0022000015001397) [1] in c++. It exists to make a reliable reference point for future projects that needs to measure the runtime reduction of their ideas/findings, with regards to [the minimum comparator network size problem](https://en.wikipedia.org/wiki/Sorting_network) [3]. All I ask is that you reference this project when you are using it for your measurements. Especially given that others can also verify your numbers.
 
 This project is considered feature complete as the core methods are implemented in a naive/simple manner of their prolog version. However, code design, naming, or anything that improves readability are changes of interest. 
 
@@ -15,7 +15,7 @@ This project is considered feature complete as the core methods are implemented 
 - Scalable memory usage
 - Minimal heap allocations
 - Test suite
-- Components as a static library
+- Components as a static library (CPM supported)
 
 ## Running for different variables
 
@@ -25,27 +25,52 @@ The variables N, K, Threads can be set before compiling the project with the fol
  - SORTNET_PARAM_THREADS
  
 #### Example
-
-```CMake
+The application can be build for the given parameters listed above using CMake params, as seen below. This program will then run until the first sorting network is discovered.
+```bash
 cmake \
  -Happ \
  -Bbuild/app \
+ -GNinja \
  -DCMAKE_BUILD_TYPE=Release \
- -DSORTNET_PARAM_N=9
+ -DSORTNET_PARAM_N=8 \
+ -DSORTNET_PARAM_THREADS=4
+ 
+ninja --C build/app
+
+./build/app/Sortnet
 ```
 
 ## Benchmarks
 
-![](benchmark/comparison-N5.png | width=100)
-![](benchmark/comparison-N6.png | width=100)
-![](benchmark/comparison-N7.png | width=100)
-![](benchmark/comparison-N8.png | width=100)
-![](benchmark/comparison-N9.png | width=100)
+> Blue for Prolog, and orange for c++.
+<p align="center">
+<img src="benchmark/comparison-N6.png" width="400">
+<img src="benchmark/comparison-N7.png" width="400">
+</p>
+<p align="center">
+<img src="benchmark/comparison-N8.png" width="400">
+<img src="benchmark/comparison-N9.png" width="400">
+</p>
+
+
+For N9 the program was stopped before N9K10 could finish due to time. Regardless, we see that the c++ implementation has superior runtime. There might be several factors to this, the most obvious being a gain in control over the codeflow, reduced overhead. I can't speak for the compiler, as I am no prolog expert.
 
 ## Code flow
-The goal is to find a network with size K that has no smaller network able to sort a sequence of N elements. In order to do so a weak proof algorithm must be implemented that proves no smaller network exist by exploring all configurations. This is also known as brute forcing. As such the program starts with a network of zero comparators and derives all possible configurations using a [breadth first search](https://en.wikipedia.org/wiki/Breadth-first_search) [4] until a sorting network is discovered. Because every network configuration of size K is explored step wise, we know that there is no network of size K-1 that can sort a sequence of N elements - which ultimately becomes the proof that the discovered sorting network is in fact the smallest size.  
 
-However, there is no need to explore every single network as the comparators are independent functions - instead the output sets can be generated using the [zero-one principle](http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html) [5] and redundant networks can be pruned using subsumption. This is further improved upon by permuting the output set to take advantage of breaking symmetries within a step or layer (where the sets compared comes from networks with equal size).
+#### Background
+The goal of this problem is two fold; find a sorting network, and prove that there does not exist a sorting network of smaller size. This is relevant to the sequence size N, such that the problem space exists per N sequence. So far only N9 (a sequence of 9 elements) have been computed [1]. However, it was written in a high level language which adds serious cost to the runtime. This project re-implements the logic in C++ - which is a faster language than Prolog.
+
+#### Walkthrough
+
+In order to do prove that the found network is of the smallest size in the search space, a weak proof algorithm is implemented. To explore every possible configuration of comparator networks, a [breadth first search](https://en.wikipedia.org/wiki/Breadth-first_search) [4] is implemented. The root node is a empty network and every branch added is a unique comparator. The same comparator can be re-used across layers. The breadth first search is continued until a sorting network is discovered. Since every comparator network so far have been explored, we know that the newly found sorting network is the minimum size.
+
+As mentioned in the paper [1] there are ways to prune our search, which makes N values above 5 feasible. Using the [zero-one principle](http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html) [5] a output set for a given network can be computed, by checking for subsumptions between networks using these output sets we can discover redundant network, which can be pruned.
+
+The idea is that when two sets are equal or one subsumes the other, the sets would require the same configurations of comparators in order to become completely sorted. As such, we can ignore millions upon billions of cases in the larger N values. Remember we don't care how the networks look, we only care about finding the network with the fewest comparators that yields a completely sorted output set.
+
+Further, more symmetries can be detect by using permutations on the output sets as stated in the paper [1]. Which allows a significantly higher amount of networks to be pruned. Which becomes a crucial step in order to tackle higher N values (>8).
+
+#### Generate and Prune approach
 
 The generate and prune approach, is what it sounds; it generates all the networks, then identifies redundant networks through symmetry and prune redundant ones. This is the basic concept of the search space. The paper [1] explores preconditions for identifying whether two output sets may subsume one another - that are much quicker than the complete subsumption test. These are referred to as ST1, ST2, ST3 in the code.
 
@@ -53,28 +78,20 @@ This project differs from the prolog code, by working with segments of networks 
 
 ### Multi-threading
 
-Each layer can be split up into 3 parts; generating, pruning within segments (files) and pruning across segments (files). The generator phase is single threaded as it only wastes a few minutes on N9, while the multi-threaded pruning phases can take several hours to complete. 
+The process of computing each layer can be split up into 3 parts; generating, pruning within segments (files) and pruning across segments (files). The generator phase is single threaded as it only wastes a few minutes on N9, while the multi-threaded pruning phases can take several hours to complete for a single layer.
 
-Pruning within segments (files) tells each thread to work on a single segment. Since each segment is isolated, there is no need for locking and the implementation quickly becomes IO bound as the number of sets/networks reduces per segment on N9. But as N increases the complexity of pruning may go beyond the IO penalties.
+_Pruning within segments (files)_ tells each thread to work on a single segment. Since segments are isolated from each other, there is no need for synchronization between threads. However, the implementation quickly becomes IO bound as the number of sets/networks reduces per segment on N9 as each segment needs to be read and written to disk as the code progresses. But as N increases the complexity of pruning may go beyond the IO penalties. Unless a dedicated high performance NVMe disk is utilised, reducing IO wait time would be a significant speed up.
 
 ![](.github/multithreading-within-segments.gif)
 
-Pruning across segments (files) have the same issue with IO, but must also share memory across threads. After talking with an author from the paper [1] the approach was to mark one segment as read only, and the remaining segments as writeable. Where a writeable segment can only have ownership by one thread. Then every thread can share the read-only segment and see if any of the output sets subsumes any output set in the write-able segment the thread has ownership off. Once every write-able segment has been compared to the read-only segment, the process selects a different segment to be marked as read-only and the rest as write-able. Thanks to this, every output set is correctly compared across segments without the need for synchronization between jobs.
+_Pruning across segments (files)_ have the same issue with IO, but must also share memory across threads. After talking with an author from the paper [1] the approach was to mark one segment as read only, and the remaining segments as writeable. Then all threads can see the read-able segment, but a write-able segment is isolated to the thread only - aka the threads has total ownership to avoid needs for synchronization.
+
+Once every write-able segment has been compared to the read-only segment, the process selects a different segment to be marked as read-only and the rest as write-able. Thanks to this, every output set is correctly compared across segments without the need for synchronization between jobs.
 
 ![](.github/multithreading-across-segments.gif)
 
 
 ## Contributing
-
-### Build and run the standalone target
-
-Use the following command to build and run the executable target.
-
-```bash
-cmake -Happ -Bbuild/app
-cmake --build build/app
-./build/app/Sortnet --help
-```
 
 ### Build and run test suite
 
@@ -86,7 +103,7 @@ cmake --build build/test
 CTEST_OUTPUT_ON_FAILURE=1 cmake --build build/test --target test
 
 # or simply call the executable: 
-./build/test/GreeterTests
+./build/test/SortnetTests
 ```
 
 To collect code coverage information, run CMake with the `-DENABLE_TEST_COVERAGE=1` option.
@@ -107,10 +124,14 @@ cmake --build build/test --target fix-format
 
 See [Format.cmake](https://github.com/TheLartians/Format.cmake) for more options.
 
+## Thanks to
+
+ - Luís Cruz-Filipe for thorough explanation of the concepts and how the pruning steps functions in Prolog, which is consider critical insight to me. Especially lemma 6, which has been interpreted as exploring all permutations N!, while the prolog implementation explores those generated from the partition masks - which is crucial for scaling (increasing N).
+
+
 ## References
 
  - [1] https://www.sciencedirect.com/science/article/pii/S0022000015001397
- - [2] https://www.researchgate.net/publication/318729549_An_Improved_Subsumption_Testing_Algorithm_for_the_Optimal-Size_Sorting_Network_Problem
  - [3] https://en.wikipedia.org/wiki/Sorting_network
  - [4] https://en.wikipedia.org/wiki/Breadth-first_search
  - [5] http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html

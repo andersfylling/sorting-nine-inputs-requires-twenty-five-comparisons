@@ -25,8 +25,8 @@ public:
   ThreadPool& operator=(const ThreadPool&) = delete;
 
   // but movable
-  ThreadPool(ThreadPool&&) = default;
-  ThreadPool& operator=(ThreadPool&&) = default;
+//  ThreadPool(ThreadPool&&) = default;
+//  ThreadPool& operator=(ThreadPool&&) = default;
 
   // clears job queue, then blocks until all threads are finished executing their current job
   ~ThreadPool();

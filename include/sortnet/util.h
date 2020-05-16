@@ -126,21 +126,21 @@ std::string to_string_knuth_diagram(const net_t& net, const uint8_t N, const seq
   }
   std::string output{};
 
-  for (auto i = 0; i < N; i++) {
+  for (auto i = 0; i < N; ++i) {
     auto ir = (N - 1) - i;
     // vertex / node
-    output += s == 0 ? " " : std::to_string((s >> ir) & 1);
+    output += s == 0 ? "  " : std::to_string((s >> ir) & 1) + " ";
     for (auto it{net.cbegin()}; it != net.cend(); ++it) {
       const Comparator& c{*it};
       output += "--";
-      if (c.from == i || c.to == i) {  // TODO: might need to be inverted!
+      if (c.from == ir || c.to == ir) {
         output += "+";
       } else {
         output += "-";
       }
     }
     output += "--";
-    output += s == 0 ? " " : std::to_string((sOutput >> ir) & 1);
+    output += s == 0 ? "  " : " " + std::to_string((sOutput >> ir) & 1);
     output += "\n";
 
     if (i + 1 == N) {
@@ -148,11 +148,11 @@ std::string to_string_knuth_diagram(const net_t& net, const uint8_t N, const seq
     }
 
     // spaces & edge
-    output += " ";
+    output += "  ";
     for (auto it{net.cbegin()}; it != net.cend(); ++it) {
       const Comparator& c{*it};
       output += "  ";
-      if (i < c.to && (i == c.from || i > c.from)) {  // TODO: might need to be inverted!
+      if (ir > c.to && ir <= c.from) {  // TODO: might need to be inverted!
         output += "|";
       } else {
         output += " ";

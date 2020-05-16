@@ -10,3 +10,5 @@ test/cmake-build-debug/*
 test/cmake-build-release/*
 app/src/settings.h
 benchmark/.idea
+network*
+app/src/settings.h

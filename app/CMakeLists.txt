@@ -63,14 +63,14 @@ add_executable(SortnetApp ${headers} ${sources})
 
 set_target_properties(SortnetApp PROPERTIES
   CXX_STANDARD 20
-  COMPILE_FLAGS "-Wall -Wextra -Wno-sign-compare -Wno-narrowing -fconcepts"
+  COMPILE_FLAGS "-Wall -Wextra -Wno-sign-compare -Wno-narrowing"
   OUTPUT_NAME "SortnetApp"
 ) #  -fsanitize=undefined
 
 # enable compiler warnings
 if (NOT TEST_INSTALLED_VERSION)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(Sortnet PUBLIC -Wall -Wextra -Werror -fconcepts)
+        target_compile_options(Sortnet PUBLIC -Wall -Wextra -Werror)
     elseif(MSVC)
         target_compile_options(Sortnet PUBLIC /W4 /WX)
     endif()

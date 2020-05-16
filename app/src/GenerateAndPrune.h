@@ -259,8 +259,9 @@ public:
     // #############################################
     //
     // iteratively generate and prune networks
+    uint8_t layer{0};
     storeEmptyNetworkWithOutputSet();
-    for (uint8_t layer{1}; layer <= K; ++layer) {
+    for (layer = 1; layer <= K; ++layer) {
       metric = &metrics.at(layer);
 
       // layer insight / progress
@@ -342,6 +343,25 @@ public:
       const auto json = metrics.to_json(NrOfCores, ::sortnet::segment_capacity);
       storage.Save("metrics.json", json);
 #endif
+
+      // psuedo detection of sorting network
+      if (layer > 1 && generated - pruned == 1) {
+        break;
+      }
+    }
+
+    if (metric->filters() == 1) {
+      std::vector<Net> nets(1);
+      storage.Load(filenames.front().net, layer, nets.begin(), nets.end());
+      const Net& sortingNetwork = nets.at(0);
+
+      ::sortnet::sequence_t s = ::sortnet::sequence::binary::mask<N> & 0b1011010110101011101011;
+
+      std::cout << std::endl;
+      std::cout << "======== FOUND SORTING NETWORK FOR N(" + std::to_string(N) + ") ===========================================================";
+      std::cout << std::endl
+          << ::sortnet::to_string<N>(sortingNetwork) << std::endl
+          << ::sortnet::to_string_knuth_diagram(sortingNetwork, N, s) << std::endl;
     }
 
     return metrics;
@@ -496,9 +516,9 @@ public:
 
       markRedundantNetworks(begin, end);
       size = shiftRedundant(begin, end);
-      updateProgress();
       if (size == originalSize) {
         buffers.put(buffer);
+        updateProgress();
         return 0;
       }
 
@@ -509,6 +529,7 @@ public:
 #endif
 
       buffers.put(buffer);
+      updateProgress();
       return originalSize - size;
     };
 

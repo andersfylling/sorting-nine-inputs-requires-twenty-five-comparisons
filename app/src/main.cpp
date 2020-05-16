@@ -19,7 +19,7 @@
 
 constexpr uint8_t N{PARAM_N > 0 ? PARAM_N : 7};
 constexpr uint8_t K{PARAM_K > 0 ? PARAM_K : ::sortnet::networkSizeUpperBound<N>()};
-constexpr uint8_t Threads{PARAM_THREADS > 0 ? PARAM_THREADS : 2};
+constexpr uint8_t Threads{PARAM_THREADS > 2 ? PARAM_THREADS : 2};
 
 int main(int argc, char** argv) {
   cxxopts::Options options(argv[0],
