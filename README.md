@@ -40,7 +40,11 @@ ninja --C build/app
 ./build/app/Sortnet
 ```
 
+##### Building and running N7
 ![](.github/build-and-run-n7.gif)
+
+##### Running N8
+![](.github/run-n8.gif)
 
 ## Benchmarks
 
