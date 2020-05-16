@@ -40,6 +40,8 @@ ninja --C build/app
 ./build/app/Sortnet
 ```
 
+![](.github/build-and-run-n7.gif)
+
 ## Benchmarks
 
 > Blue for Prolog, and orange for c++.

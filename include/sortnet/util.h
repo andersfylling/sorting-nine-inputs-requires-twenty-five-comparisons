@@ -112,7 +112,7 @@ template <uint8_t N, concepts::Set set_t> std::string to_string(set_t& set) {
 }
 
 // same as in papers => (from, to); (from, to); etc.
-template <uint8_t N> std::string to_string(Comparator c) {
+template <uint8_t N> std::string to_string(const Comparator& c) {
   constexpr auto base{N - 1};
   return "(" + ::std::to_string(int(base - c.from)) + "," + ::std::to_string(int(base - c.to))
          + ");";
@@ -176,14 +176,8 @@ std::string to_string(const net_t& net, sequence_t s = 0) {
   // the compact version simply list the comparators as ordered sets
   // with node numbers in a left to right, top-down traversal.
   // eg: "(1, 2); (3, 4); (1, 4);"
-  std::size_t i{0};
-  for (auto it{net.cbegin()}; it != net.cend(); ++it) {
-    const Comparator& c{*it};
-    if (i == net.size()) {
-      break;
-    }
+  for (const ::sortnet::Comparator& c : net) {
     output += to_string<N>(c) + " ";
-    ++i;
   }
 
   if (sOutput > 0) {
@@ -192,5 +186,10 @@ std::string to_string(const net_t& net, sequence_t s = 0) {
   }
 
   return output + "\n";
+}
+
+template <uint8_t N> std::string to_string(const sequence_t s) {
+  auto bs = std::bitset<N>(s);
+  return bs.to_string();
 }
 }  // namespace sortnet

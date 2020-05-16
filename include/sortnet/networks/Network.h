@@ -73,10 +73,10 @@ public:
 
   // iterators for the comparators
   using const_iterator = typename std::vector<::sortnet::Comparator>::const_iterator;
-  using iterator = typename std::vector<::sortnet::Comparator>::iterator;
-  iterator begin() { return comparators.begin(); }
+//  using iterator = typename std::vector<::sortnet::Comparator>::iterator;
+  [[nodiscard]] const_iterator begin() const noexcept { return comparators.cbegin(); }
   [[nodiscard]] const_iterator cbegin() const noexcept { return comparators.cbegin(); }
-  iterator end() { return comparators.end(); }
+  [[nodiscard]] const_iterator end() const noexcept { return comparators.cend(); }
   [[nodiscard]] const_iterator cend() const noexcept { return comparators.cend(); }
 
   // serialize network

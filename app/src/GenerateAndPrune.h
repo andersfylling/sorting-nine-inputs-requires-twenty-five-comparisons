@@ -4,6 +4,7 @@
 #include <sortnet/json.h>
 #include <sortnet/metric.h>
 #include <sortnet/permutation.h>
+#include <sortnet/comparator.h>
 #include <sortnet/z_environment.h>
 
 #include <algorithm>
@@ -19,7 +20,6 @@
 
 #include "BufferPool.h"
 #include "progress.h"
-#include "sortnet/comparator.h"
 #include "sortnet/sequence.h"
 #include "vendors/github.com/dabbertorres/ThreadPool/ThreadPool.h"
 
@@ -359,9 +359,41 @@ public:
 
       std::cout << std::endl;
       std::cout << "======== FOUND SORTING NETWORK FOR N(" + std::to_string(N) + ") ===========================================================";
-      std::cout << std::endl
-          << ::sortnet::to_string<N>(sortingNetwork) << std::endl
-          << ::sortnet::to_string_knuth_diagram(sortingNetwork, N, s) << std::endl;
+      std::cout << std::endl;
+      std::cout << "total time: " << metrics.Seconds() << "s" << std::endl;
+
+      std::cout << std::endl;
+
+      // eg: "(1, 2); (3, 4); (1, 4);"
+      // but do a break after every 10 comparator
+      std::cout << "set of comparators"
+                << std::endl;
+      int i{0};
+      for (const ::sortnet::Comparator& c : sortingNetwork) {
+        std::cout << ::sortnet::to_string<N>(c) << " ";
+        if (++i % 10 == 0) {
+          std::cout << std::endl << '\t';
+        }
+      }
+      std::cout << std::endl;
+
+      // display a converted sequence
+      std::cout
+          << std::endl
+          << "applied to a binary sequence"
+          << std::endl
+          << ::sortnet::to_string<N>(s)
+          << " => "
+          << ::sortnet::to_string<N>(sortingNetwork.run(s))
+          << std::endl;
+
+      // display the knuth diagram with channel input & output values
+      std::cout
+          << std::endl
+          << "Knuth Diagram"
+          << std::endl
+          << ::sortnet::to_string_knuth_diagram(sortingNetwork, N, s)
+          << std::endl;
     }
 
     return metrics;
