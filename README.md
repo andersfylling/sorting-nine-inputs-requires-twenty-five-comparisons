@@ -74,15 +74,15 @@ In order to do prove that the found network is of the smallest size in the searc
 
 As mentioned in the paper [1] there are ways to prune our search, which makes N values above 5 feasible. Using the [zero-one principle](http://www.euroinformatica.ro/documentation/programming/!!!Algorithms_CORMEN!!!/DDU0170.html) [5] a output set for a given network can be computed, by checking for subsumptions between networks using these output sets we can discover redundant network, which can be pruned.
 
-The idea is that when two sets are equal or one subsumes the other, the sets would require the same configurations of comparators in order to become completely sorted. As such, we can ignore millions upon billions of cases in the larger N values. Remember we don't care how the networks look, we only care about finding the network with the fewest comparators that yields a completely sorted output set.
+The idea is that when two sets are equal or one subsumes the other, the sets would require the same configurations of comparators in order to become completely sorted. As such, millions upon billions of cases for larger N values can be ignored. It is imperative to keep in mind the importance of finding the sorting network with the fewest comparators, rather than the combinations of independent comparators that shapes the network.
 
 Further, more symmetries can be detect by using permutations on the output sets as stated in the paper [1]. Which allows a significantly higher amount of networks to be pruned. Which becomes a crucial step in order to tackle higher N values (>8).
 
 #### Generate and Prune approach
 
-The generate and prune approach, is what it sounds; it generates all the networks, then identifies redundant networks through symmetry and prune redundant ones. This is the basic concept of the search space. The paper [1] explores preconditions for identifying whether two output sets may subsume one another - that are much quicker than the complete subsumption test. These are referred to as ST1, ST2, ST3 in the code.
+The generate and prune approach, consists of two phases; generateing the networks and their output sets for a specific layer, and pruning away the redundant networks and their output sets. This is the basic concept that continuously explores the search space until a sorting network is found. The paper [1] identifies preconditions for subsumption before a permutation is applied. Significantly reducing the number of complete subsumption tests. These are referred to as ST1, ST2, ST3 in the code.
 
-This project differs from the prolog code, by working with segments of networks and their output sets. It is not explicitly clear to me how prolog does this internally - regardless, by working on segments instead of singular networks it becomes easier to visualize the multi-threading aspects of the code. Once work is done on a segment, the result or updated segment is written it's own file. Networks and output sets do not share the same file, but merely a segment ID to reduce overall IO. From my understanding the prolog version, for every layer, writes the generated networks and output sets to a single file and then the pruned version to a new file once that layer is fully explored. 
+Sticking with the concept of segments throughout the code base, it becomes easier to see how memory is saved and to visualize the multithreading behaviour. Once work is done on a segment, the result or updated segment is written it's own file. Networks and output sets do not share the same file, but merely a segment ID to allow decoupling and reduce overall IO calls.
 
 ### Multi-threading
 
