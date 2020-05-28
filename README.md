@@ -66,7 +66,7 @@ For N9 the program was stopped before N9K10 could finish due to time. Regardless
 ## Code flow
 
 #### Background
-The goal of this problem is two fold; find a sorting network, and prove that there does not exist a sorting network of smaller size. This is relevant to the sequence size N, such that the problem space exists per N sequence. So far only N9 (a sequence of 9 elements) have been computed [1]. However, it was written in a high level language which adds serious cost to the runtime. This project re-implements the logic in C++ - which is a faster language than Prolog.
+The goal of this problem is two fold; find a sorting network, and prove that there does not exist a sorting network of smaller size. This is relevant to the sequence size N, such that the problem space exists per N sequence. So far only N9 (a sequence of 9 elements) have been computed [1]. However, it was written in a high level language which adds serious cost to the runtime. This project re-implements the logic in C++ in order to "remove the cost of the language", introducing a more accurate runtime cost of just the algorithm itself.
 
 #### Walkthrough
 
