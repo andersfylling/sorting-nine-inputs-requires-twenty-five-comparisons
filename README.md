@@ -4,6 +4,8 @@
 [![Actions Status](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/workflows/Style/badge.svg)](https://github.com/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/actions)
 [![codecov](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons/branch/master/graph/badge.svg)](https://codecov.io/gh/andersfylling/sorting-nine-inputs-requires-twenty-five-comparisons)
 
+> Failing due to old clang and gcc versions
+
 # About
 This is a **third-party** implementation of the paper ["*Sorting nine inputs requires twenty-five comparisons*"](https://www.sciencedirect.com/science/article/pii/S0022000015001397) [1] in c++. It exists to make a reliable reference point for future projects that needs to measure the runtime reduction of their ideas/findings, with regards to [the minimum comparator network size problem](https://en.wikipedia.org/wiki/Sorting_network) [3]. All I ask is that you reference this project when you are using it for your measurements. Especially given that others can also verify your numbers.
 
