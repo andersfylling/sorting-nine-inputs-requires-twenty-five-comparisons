@@ -10,16 +10,16 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v1
     
     - name: configure
-      run: CXX=g++-9 cmake -Htest -Bbuild -DENABLE_TEST_COVERAGE=1
+      run: CXX=clang++-11 cmake -Htest -Bbuild -DENABLE_TEST_COVERAGE=1
 
     - name: build
-      run: CXX=g++-9 cmake --build build --config Debug -j4
+      run: CXX=clang++-11 cmake --build build --config Debug -j4
 
     - name: test
       run: |
