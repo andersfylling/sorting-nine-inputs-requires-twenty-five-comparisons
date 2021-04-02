@@ -45,7 +45,7 @@ set_target_properties(SortnetTests PROPERTIES CXX_STANDARD 20)
 # enable compiler warnings
 if (NOT TEST_INSTALLED_VERSION)
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(Sortnet PUBLIC -Wall -pedantic -Wextra -Werror -fconcepts)
+    target_compile_options(Sortnet PUBLIC -Wall -pedantic -Wextra -Werror) # -fconcepts)
   elseif(MSVC)
     target_compile_options(Sortnet PUBLIC /W4 /WX)
   endif()
