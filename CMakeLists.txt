@@ -88,7 +88,7 @@ FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/
 # add_library(Greeter INTERFACE)  
 # set_target_properties(Greeter PROPERTIES INTERFACE_COMPILE_FEATURES cxx_std_17)
 
-set(CMAKE_REQUIRED_FLAGS -fconcepts)
+# set(CMAKE_REQUIRED_FLAGS -fconcepts)
 
 add_library(Sortnet STATIC ${headers} ${sources})
 
