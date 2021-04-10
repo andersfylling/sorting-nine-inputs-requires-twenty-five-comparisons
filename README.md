@@ -136,7 +136,7 @@ See [Format.cmake](https://github.com/TheLartians/Format.cmake) for more options
 
 ## Thanks to
 
- - Luís Cruz-Filipe for thorough explanation of the concepts and how the pruning steps functions in Prolog, which is consider critical insight to me. Especially lemma 6, which has been interpreted as exploring all permutations N!, while the prolog implementation explores those generated from the partition masks - which is crucial for scaling (increasing N).
+ - Luís Cruz-Filipe for thorough explanation of the concepts and how the pruning steps functions in Prolog, which was critical insight to me. Especially lemma 6, which has been interpreted as exploring all permutations N!, while the prolog implementation explores those generated from the partition masks - which is crucial for scaling (increasing N).
 
 
 ## References
